@@ -40,3 +40,7 @@ Thumbs.db
 
 # Claude Remember plugin (per-developer memory, never shared)
 .remember/
+
+# Mission databases and tiles are large and may contain real positions
+*.mbtiles
+missions/

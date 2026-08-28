@@ -1,0 +1,104 @@
+# Discord notifications for the things Discord's native GitHub webhook does NOT render:
+#   1. CI results (workflow_run is accepted by Discord's /github endpoint but never displayed)
+#   2. Review requests with a real @mention so the reviewer gets pinged
+#
+# Requires two repository settings (Settings > Secrets and variables > Actions):
+#   secret   DISCORD_WEBHOOK_URL   the raw Discord webhook URL (no /github suffix)
+#   variable DISCORD_USER_MAP      JSON mapping GitHub login -> Discord user ID or LIST of IDs
+#            (for someone with two Discord accounts), e.g.
+#            {"jjwagner": "1111", "coreybbgreene": ["2222", "3333"]}
+#            Discord user IDs come from Discord > User Settings > Advanced > Developer Mode,
+#            then right-click a member > Copy User ID. They are not secrets.
+
+name: Discord notify
+
+on:
+  workflow_run:
+    workflows: [CI]
+    types: [completed]
+  pull_request:
+    types: [review_requested, ready_for_review]
+
+permissions:
+  contents: read
+  pull-requests: read
+
+jobs:
+  ci-result:
+    if: github.event_name == 'workflow_run'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Post CI result
+        env:
+          WEBHOOK: ${{ secrets.DISCORD_WEBHOOK_URL }}
+          USER_MAP: ${{ vars.DISCORD_USER_MAP }}
+          CONCLUSION: ${{ github.event.workflow_run.conclusion }}
+          BRANCH: ${{ github.event.workflow_run.head_branch }}
+          ACTOR: ${{ github.event.workflow_run.actor.login }}
+          URL: ${{ github.event.workflow_run.html_url }}
+          TITLE: ${{ github.event.workflow_run.display_title }}
+        run: |
+          python3 - <<'PY'
+          import json, os, urllib.request
+          hook = os.environ["WEBHOOK"]
+          if not hook:
+              raise SystemExit("DISCORD_WEBHOOK_URL not set")
+          user_map = json.loads(os.environ.get("USER_MAP") or "{}")
+          def m(login):
+              v = user_map.get(login)
+              if not v:
+                  return f"@{login}"
+              ids = v if isinstance(v, list) else [v]
+              return " ".join(f"<@{i}>" for i in ids)
+          mention = m(os.environ["ACTOR"])
+          ok = os.environ["CONCLUSION"] == "success"
+          # Only ping on failure; success is a quiet line so the channel stays readable.
+          content = (f"CI **passed** on `{os.environ['BRANCH']}`: {os.environ['TITLE']} <{os.environ['URL']}>"
+                     if ok else
+                     f"CI **{os.environ['CONCLUSION']}** on `{os.environ['BRANCH']}` ({mention}): "
+                     f"{os.environ['TITLE']} <{os.environ['URL']}>")
+          body = json.dumps({"content": content, "allowed_mentions": {"parse": ["users"]}}).encode()
+          req = urllib.request.Request(hook, data=body, headers={"Content-Type": "application/json"})
+          urllib.request.urlopen(req)
+          PY
+
+  review-request:
+    if: github.event_name == 'pull_request' && github.event.pull_request.draft == false
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping requested reviewers
+        env:
+          WEBHOOK: ${{ secrets.DISCORD_WEBHOOK_URL }}
+          USER_MAP: ${{ vars.DISCORD_USER_MAP }}
+          ACTION: ${{ github.event.action }}
+          REQUESTED: ${{ github.event.requested_reviewer.login }}
+          REVIEWERS: ${{ toJson(github.event.pull_request.requested_reviewers.*.login) }}
+          AUTHOR: ${{ github.event.pull_request.user.login }}
+          NUMBER: ${{ github.event.pull_request.number }}
+          TITLE: ${{ github.event.pull_request.title }}
+          URL: ${{ github.event.pull_request.html_url }}
+        run: |
+          python3 - <<'PY'
+          import json, os, urllib.request
+          hook = os.environ["WEBHOOK"]
+          if not hook:
+              raise SystemExit("DISCORD_WEBHOOK_URL not set")
+          user_map = json.loads(os.environ.get("USER_MAP") or "{}")
+          def m(login):
+              v = user_map.get(login)
+              if not v:
+                  return f"@{login}"
+              ids = v if isinstance(v, list) else [v]
+              return " ".join(f"<@{i}>" for i in ids)
+          if os.environ["ACTION"] == "review_requested":
+              targets = [os.environ["REQUESTED"]] if os.environ["REQUESTED"] else []
+          else:  # ready_for_review: ping everyone already requested
+              targets = json.loads(os.environ["REVIEWERS"] or "[]")
+          if not targets:
+              raise SystemExit(0)
+          content = (f"Review requested from {' '.join(m(t) for t in targets)} by {m(os.environ['AUTHOR'])}: "
+                     f"PR #{os.environ['NUMBER']} {os.environ['TITLE']} <{os.environ['URL']}>")
+          body = json.dumps({"content": content, "allowed_mentions": {"parse": ["users"]}}).encode()
+          req = urllib.request.Request(hook, data=body, headers={"Content-Type": "application/json"})
+          urllib.request.urlopen(req)
+          PY

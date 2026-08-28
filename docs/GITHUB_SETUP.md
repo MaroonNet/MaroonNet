@@ -8,7 +8,7 @@ Every step says whether it is terminal, browser, or Claude Code.
 **Organization vs. personal repo.** Create a free GitHub *organization* (for example `maroonnet`)
 and put the repo under it rather than under your personal account. Reasons: the repo survives if
 any one of you leaves or graduates; all four of you can be Owners so no single person is a
-bottleneck; the URL (`github.com/maroonnet/MaroonNet`) reads like a real project on a resume and to
+bottleneck; the URL (`github.com/maroonnet/maroonnet`) reads like a real project on a resume and to
 the SAR teams you are emailing. Free orgs get rulesets on public repos, which is exactly what you
 need. Add Ogle as an outside collaborator with read access if he wants to watch.
 
@@ -47,7 +47,7 @@ Each teammate does the same block on their own machine.
 ## 2. Create the organization and repo (browser + terminal)
 
 Browser: github.com > your avatar > **Your organizations** > **New organization** > Free.
-Name it `maroonnet` (or whatever you settle on; renaming an org later is possible but annoying).
+Name it `maroonnet` (fall back to `maroonnet-sar` if taken). Renaming an org later is possible but annoying.
 Invite JJ, Elijah, and Diego as **Owners** (Settings > People > Invite member, role Owner).
 
 Terminal, from the folder where you unzipped the starter:
@@ -59,12 +59,12 @@ cd ~/workspace/maroonnet
 git init
 git add -A
 git commit -m "chore: initial repository scaffold"
-gh repo create maroonnet/MaroonNet --public --source=. --remote=origin --push \
-  --description "Open-source location tracking and after-action replay for Search & Rescue over LoRa/Meshtastic mesh"
+gh repo create maroonnet/maroonnet --public --source=. --remote=origin --push \
+  --description "Offline SAR mesh command post on Meshtastic: live POD, terrain-aware coverage, topology risk, replay, CalTopo interop"
 ```
 
-Before `git add -A`, open `.github/CODEOWNERS` and replace the placeholder handles with everyone's
-real GitHub usernames.
+Before `git add -A`: open `.github/CODEOWNERS` and replace the placeholder handles with everyone's
+real GitHub usernames, and drop JJ's Project Bible PDF (and the SOW) into `docs/bible/`.
 
 ## 3. Repository settings (browser, Settings tab of the repo)
 
@@ -131,7 +131,7 @@ If you rename a job, update the ruleset JSON and re-import, or edit the ruleset 
 ~/workspace/
   mach/         internship
   bootdotdev/   personal training
-  maroonnet/    this repo (one clone; branches, not copies)
+  maroonnet/     this repo (one clone; branches, not copies)
 ```
 
 One clone, many branches. Do not keep separate folders per feature. The rhythm:
@@ -139,12 +139,12 @@ One clone, many branches. Do not keep separate folders per feature. The rhythm:
 ```bash
 cd ~/workspace/maroonnet
 git switch main && git pull
-git switch -c feat/thing
+git switch -c feature/thing
 # work, commit in small steps
-git push -u origin feat/thing
+git push -u origin feature/thing
 gh pr create --fill
 # after review + merge:
-git switch main && git pull && git branch -d feat/thing
+git switch main && git pull && git branch -d feature/thing
 ```
 
 If you want to work on two branches at once without stashing, use worktrees rather than a second
@@ -156,9 +156,10 @@ that does this for you.
 - `CLAUDE.md` is loaded automatically. Run `/context` in a session and confirm it appears under
   *Memory files*.
 - `.claude/settings.json` is committed and enables the `github`, `commit-commands`,
-  `pr-review-toolkit`, `security-guidance`, and `pyright-lsp` plugins for everyone who trusts the
+  `pr-review-toolkit`, `security-guidance`, `pyright-lsp`, and `typescript-lsp` plugins for everyone who trusts the
   folder. Each teammate will be prompted to install them the first time; accept. `pyright-lsp` needs
-  `pip install pyright` (or `uv tool install pyright`) on each machine.
+  `uv tool install pyright` and `typescript-lsp` needs `npm i -g typescript-language-server typescript`
+  on each machine.
 - The same file denies force-pushes, direct pushes to main, and reads of `.env`/key files from
   inside Claude Code, as a belt to the ruleset's suspenders.
 - Personal preferences go in `CLAUDE.local.md` (gitignored) or `~/.claude/CLAUDE.md`, never in the
@@ -166,11 +167,40 @@ that does this for you.
 - Run `/init` once after the first real code lands; it will suggest additions to `CLAUDE.md` based on
   the actual codebase. Review its suggestions in a PR like anything else.
 
-## 7. Things to do in the first week
+## 7. GitHub to Discord
 
-- Replace the placeholder stack section in `CLAUDE.md` after Wednesday's meeting with Ogle, via PR.
-- Write ADR 0001 (stack choice) and ADR 0002 (position-data retention and access) so the
-  privacy posture is decided before the first ping is stored.
-- Enable a GitHub Project board (Projects tab > New project > Board) with columns Backlog / This
-  week / In review / Done, and have Diego link it in the minutes.
+Two layers, because Discord's built-in GitHub renderer covers most events but silently drops CI
+results (`workflow_run` returns 204 and never shows), and it cannot @mention anyone.
+
+**Layer 1: native webhook (5 minutes).** In Discord: channel settings > Integrations > Webhooks >
+New Webhook, name it `GitHub`, copy the URL. In GitHub: repo Settings > Webhooks > Add webhook.
+Payload URL is the Discord URL **with `/github` appended**; content type `application/json`; leave
+the secret blank; choose *Let me select individual events* and tick Pull requests, Pull request
+reviews, Pull request review comments, Issues, Issue comments, Pushes, Releases. Discord renders
+these as embeds. Do not tick Check runs, Check suites, or Workflow runs; Discord accepts and drops them.
+
+**Layer 2: `discord-notify.yml` (10 minutes).** It posts CI pass/fail after every run (with an
+@mention of the author on failure) and @mentions each requested reviewer when a review is requested
+or a draft is marked ready. Setup:
+
+1. Create a second Discord webhook (or reuse the first) and copy the raw URL, **without** `/github`.
+2. Repo Settings > Secrets and variables > Actions > **Secrets** > New repository secret:
+   `DISCORD_WEBHOOK_URL` = that URL.
+3. Same page > **Variables** > New repository variable: `DISCORD_USER_MAP` = JSON mapping GitHub
+   logins to Discord user IDs, e.g. `{"coreygreene":"123456789012345678","jjwagner":"..."}`.
+   Discord IDs: User Settings > Advanced > Developer Mode on, then right-click a member > Copy User ID.
+4. Open a test PR and request a review; the mention should land within a minute.
+
+Discord webhook URLs are secrets: anyone with one can post to the channel. Rotate the webhook if a
+URL ever ends up in a commit or a screenshot.
+
+## 8. Things to do in the first week
+
+- Commit the Project Bible and SOW under `docs/bible/` (JJ) so `CLAUDE.md` can point at them.
+- Open the first PR against `spec/`: interface spec v0.1 (schema with the full per-packet log fields,
+  WebSocket message types, REST endpoints) before Monday, v1.0 merged by Friday (Bible §14.5). This is
+  JJ's, but the repo has to exist first, so the org and ruleset come before the weekend.
+- Add a decision-log row for position-data retention and access before the first packet is stored.
+- Enable a GitHub Project board (Projects tab > New project > Board) with columns Backlog / Sprint /
+  In progress / In review / Done; every card gets an owner, sprint, and gate label (Bible §14.4).
 - Create a `.env.example` when the first config value appears, and never a `.env`.

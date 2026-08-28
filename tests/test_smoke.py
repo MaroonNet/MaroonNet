@@ -2,4 +2,4 @@
 
 
 def test_import() -> None:
-    import backend  # noqa: F401
+    import maroonnet  # noqa: F401

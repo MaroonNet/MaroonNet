@@ -1,4 +1,4 @@
-# Team meeting — YYYY-MM-DD
+# Team meeting — YYYY-MM-DD (Tue/Thu)
 
 Attendees:
 Scribe: Diego
@@ -10,11 +10,11 @@ Scribe: Diego
 - Elijah:
 - Diego:
 
-## Decisions
+## Decisions (copy anything durable to docs/decisions/log.md)
 
 ## Action items
 
 | Owner | Item | Due |
 | ----- | ---- | --- |
 
-## For Ogle (Wednesday)
+## For the Wednesday advisor meeting

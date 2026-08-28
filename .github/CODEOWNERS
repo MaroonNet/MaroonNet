@@ -1,9 +1,12 @@
-# Replace the handles below with the real GitHub usernames once everyone has joined.
-# CODEOWNERS auto-requests reviews; it does not by itself block merges (the ruleset does that).
+# CODEOWNERS auto-requests reviews; the ruleset (2 approvals) is what blocks merges.
+# Owners follow Bible Ch. 15: JJ owns the interface spec and bridge; fill the other roles in.
 
-*                   @COREY_HANDLE @JJ_HANDLE @ELIJAH_HANDLE @DIEGO_HANDLE
-/.github/           @COREY_HANDLE
-/CLAUDE.md          @COREY_HANDLE @JJ_HANDLE @ELIJAH_HANDLE @DIEGO_HANDLE
-/hardware/          @JJ_HANDLE
-/docs/minutes/      @DIEGO_HANDLE
-/docs/research/     @ELIJAH_HANDLE
+*                         @coreybbgreene @jj-wagner @heimsothe @alasdiego
+/spec/                    @jj-wagner
+/maroonnet/bridge/         @jj-wagner
+/.github/                 @coreybbgreene
+/CLAUDE.md                @coreybbgreene @jj-wagner @heimsothe @alasdiego
+/docs/bible/              @jj-wagner
+/docs/minutes/            @alasdiego
+/docs/research/           @heimsothe
+/hardware/                @jj-wagner
