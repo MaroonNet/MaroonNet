@@ -1,0 +1,9 @@
+# Replace the handles below with the real GitHub usernames once everyone has joined.
+# CODEOWNERS auto-requests reviews; it does not by itself block merges (the ruleset does that).
+
+*                   @COREY_HANDLE @JJ_HANDLE @ELIJAH_HANDLE @DIEGO_HANDLE
+/.github/           @COREY_HANDLE
+/CLAUDE.md          @COREY_HANDLE @JJ_HANDLE @ELIJAH_HANDLE @DIEGO_HANDLE
+/hardware/          @JJ_HANDLE
+/docs/minutes/      @DIEGO_HANDLE
+/docs/research/     @ELIJAH_HANDLE
