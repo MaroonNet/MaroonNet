@@ -1,0 +1,802 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MaroonNet — Foundation Inventory v2</title>
+<style>
+  :root {
+    --maroon: #7B1E2B;
+    --maroon-deep: #56141E;
+    --maroon-wash: #F7EEEF;
+    --ink: #1F1B1C;
+    --ink-soft: #5E5558;
+    --rule: #DDD6D7;
+    --paper: #FFFFFF;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+  body {
+    margin: 0;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: Charter, "Bitstream Charter", "Liberation Serif", Georgia, "Times New Roman", serif;
+    font-size: 11.5pt;
+    line-height: 1.5;
+  }
+  .page { max-width: 7.5in; margin: 0 auto; padding: 0 0.25in; }
+
+  header.masthead {
+    border-top: 12px solid var(--maroon);
+    padding: 28px 0 22px;
+    border-bottom: 1px solid var(--rule);
+    margin-bottom: 22px;
+  }
+  header.masthead h1 {
+    margin: 0;
+    font-size: 34pt;
+    line-height: 1.05;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    color: var(--maroon);
+  }
+  header.masthead .subtitle { margin: 10px 0 0; font-size: 15pt; line-height: 1.3; color: var(--ink); }
+  header.masthead .team { margin: 10px 0 0; font-size: 12pt; color: var(--ink); }
+  header.masthead .meta { margin: 8px 0 0; font-size: 10.5pt; color: var(--ink-soft); }
+
+  /* Contents */
+  .contents { margin: 0 0 10px; }
+  .contents h2 { border: 0; margin-bottom: 8px; }
+  .contents .part-label {
+    font-size: 12.5pt; font-weight: 700; color: var(--ink); margin: 14px 0 6px;
+  }
+  .contents ol { list-style: none; margin: 0; padding: 0 0 0 4px; border-left: 2px solid var(--rule); }
+  .contents li { margin: 0; padding: 3px 0 3px 12px; font-size: 11pt; }
+  .contents li a { color: var(--ink); text-decoration: none; }
+  .contents li a:hover, .contents li a:focus-visible { color: var(--maroon); outline: none; }
+  .contents li .n { display: inline-block; min-width: 2.4ch; color: var(--ink-soft); }
+
+  /* Part dividers */
+  .part {
+    margin: 36px 0 22px;
+    padding: 18px 20px;
+    background: var(--maroon);
+    color: #fff;
+    break-before: page;
+  }
+  .part .kicker { font-size: 10.5pt; opacity: 0.85; margin: 0 0 2px; }
+  .part h2 { margin: 0; font-size: 22pt; line-height: 1.15; color: #fff; border: 0; padding: 0; }
+  .part p.lede { margin: 8px 0 0; font-size: 11pt; opacity: 0.95; }
+
+  section { margin: 0 0 30px; }
+  section h2 {
+    font-size: 18pt;
+    line-height: 1.2;
+    margin: 0 0 12px;
+    padding-bottom: 5px;
+    border-bottom: 2px solid var(--maroon);
+    color: var(--maroon);
+    font-weight: 700;
+    break-after: avoid;
+  }
+  section h2 .num { display: inline-block; min-width: 2.4ch; margin-right: 8px; color: var(--ink-soft); font-weight: 400; }
+  section h3 {
+    font-size: 13pt;
+    margin: 20px 0 7px;
+    font-weight: 700;
+    color: var(--ink);
+    break-after: avoid;
+  }
+  section h3 .num { color: var(--maroon); margin-right: 6px; font-weight: 700; }
+  p { margin: 0 0 10px; }
+  a { color: var(--maroon); }
+  strong { font-weight: 700; }
+  ul, ol { margin: 0 0 10px; padding-left: 22px; }
+  li { margin-bottom: 4px; }
+  .ref { color: var(--maroon); white-space: nowrap; }
+
+  .note {
+    border-left: 4px solid var(--maroon);
+    background: var(--maroon-wash);
+    padding: 9px 13px;
+    margin: 0 0 12px;
+    break-inside: avoid;
+  }
+  .note p:last-child { margin-bottom: 0; }
+
+  .tablewrap { margin: 0 0 14px; }
+  table { border-collapse: collapse; width: 100%; font-size: 9.6pt; line-height: 1.38; }
+  th, td { text-align: left; vertical-align: top; padding: 5px 7px; border-bottom: 1px solid var(--rule); }
+  th { color: var(--maroon); font-weight: 700; border-bottom: 2px solid var(--maroon); }
+  thead { display: table-header-group; }
+  tr { break-inside: avoid; }
+  tbody tr:last-child td { border-bottom: 2px solid var(--rule); }
+  td:first-child { font-weight: 700; }
+
+  pre {
+    background: var(--maroon-wash);
+    border-left: 4px solid var(--maroon);
+    padding: 10px 12px;
+    overflow-x: auto;
+    font-family: "Liberation Mono", Menlo, Consolas, monospace;
+    font-size: 8.6pt;
+    line-height: 1.42;
+    margin: 0 0 12px;
+    white-space: pre;
+    break-inside: avoid;
+  }
+  code { font-family: "Liberation Mono", Menlo, Consolas, monospace; font-size: 0.9em; }
+
+  footer.end { border-top: 1px solid var(--rule); color: var(--ink-soft); font-size: 9.5pt; padding: 14px 0 30px; margin-top: 20px; }
+
+  @page { size: letter; margin: 0.7in 0.6in 0.75in; }
+  @media print {
+    body { font-size: 10.6pt; }
+    .page { max-width: none; padding: 0; }
+    a { color: inherit; text-decoration: none; }
+    .part { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .note, pre, th { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+<header class="masthead">
+  <h1>MaroonNet</h1>
+  <p class="subtitle">Foundation Inventory: Every piece of the current system, what already exists, what to build, and what it costs</p>
+  <p class="team">CU Denver Capstone Team: Diego Alas, Corey Greene, Elijah Heimsoth, Joshua 'JJ' Wagner</p>
+  <p class="meta">Discovery phase working document, version 2 · Prepared by Corey Greene · September 7, 2026</p>
+</header>
+
+<section class="contents">
+  <h2>Contents</h2>
+  <p class="part-label">Part One: The Three Pillars</p>
+  <ol>
+    <li><a href="#s1"><span class="n">1</span>Where the design stands</a></li>
+    <li><a href="#s2"><span class="n">2</span>Radio and mesh layer</a></li>
+    <li><a href="#s3"><span class="n">3</span>Command post application</a></li>
+    <li><a href="#s4"><span class="n">4</span>Live mission storage</a></li>
+    <li><a href="#s5"><span class="n">5</span>Pillar one: Sector Probability</a></li>
+    <li><a href="#s6"><span class="n">6</span>Pillar two: Mesh Coverage Data</a></li>
+    <li><a href="#s7"><span class="n">7</span>Pillar three: Mission Pre-Planning</a></li>
+    <li><a href="#s8"><span class="n">8</span>What already exists</a></li>
+    <li><a href="#s9"><span class="n">9</span>Pieces not yet on the list</a></li>
+    <li><a href="#s10"><span class="n">10</span>How the pieces connect</a></li>
+    <li><a href="#s11"><span class="n">11</span>Costs and roadblocks</a></li>
+    <li><a href="#s12"><span class="n">12</span>Questions before Design</a></li>
+  </ol>
+  <p class="part-label">Part Two: The Three Growth Objectives</p>
+  <ol>
+    <li><a href="#s13"><span class="n">13</span>Field User Sync</a></li>
+    <li><a href="#s14"><span class="n">14</span>Drone Extension</a></li>
+    <li><a href="#s15"><span class="n">15</span>Scrubbed Server</a></li>
+    <li><a href="#s16"><span class="n">16</span>Growth dependencies and questions</a></li>
+  </ol>
+  <p style="margin-top:12px; font-size:10pt; color:var(--ink-soft);">Cross-references use section numbers, for example <span class="ref">§2.4</span>. Tables mark each piece as Exists (integrate it), Build (write it), or Collect (gather it ourselves).</p>
+</section>
+
+<!-- ===================== PART ONE ===================== -->
+<div class="part" id="part1">
+  <p class="kicker">Part One</p>
+  <h2>The Three Pillars</h2>
+  <p class="lede">The platform (radios, command post application, storage) and the three analytical components that sit on it. This is the current focus and the subject of Tuesday's discussion.</p>
+</div>
+
+<section id="s1">
+  <h2><span class="num">1</span>Where the design stands</h2>
+  <p>MaroonNet is a mesh-networked location tracking and planning tool for search and rescue teams working where there is no cell service. Scope: location management, tracking, and logging. The system has four structural layers.</p>
+  <div class="tablewrap"><table>
+    <thead><tr><th>Layer</th><th>Contents</th><th>Where covered</th></tr></thead>
+    <tbody>
+      <tr><td>Radio and mesh</td><td>Meshtastic LoRa nodes on searchers, a gateway node at the command post, mesh routing</td><td><span class="ref">§2</span></td></tr>
+      <tr><td>Command post application</td><td>Browser map, live positions, database, timelapse and coverage replay</td><td><span class="ref">§3</span>, <span class="ref">§4</span></td></tr>
+      <tr><td>Analytical components (the three pillars)</td><td>Sector Probability, Mesh Coverage Data, Mission Pre-Planning</td><td><span class="ref">§5</span>, <span class="ref">§6</span>, <span class="ref">§7</span></td></tr>
+      <tr><td>Growth objectives</td><td>Field User Sync, Drone Extension, Scrubbed Server</td><td>Part Two, <span class="ref">§13</span> to <span class="ref">§16</span></td></tr>
+    </tbody>
+  </table></div>
+
+  <h3><span class="num">1.1</span>The core loop</h3>
+  <ol>
+    <li>Searchers carry Meshtastic LoRa radios that report GPS position and timestamp over the mesh.</li>
+    <li>A gateway radio at the command post receives the mesh traffic and feeds a laptop.</li>
+    <li>A browser map on that laptop shows the team lead live searcher positions over the search area.</li>
+    <li>Everything received is written to a database.</li>
+    <li>The three pillars compute on top of that data: where the person probably is, where the radios will and will not reach, and what plan gets teams out fastest.</li>
+    <li>After the search, the database is replayed as a timelapse and coverage map for the after-action report, showing what was searched and what was missed.</li>
+  </ol>
+
+  <h3><span class="num">1.2</span>The three pillars in one line each</h3>
+  <div class="tablewrap"><table>
+    <thead><tr><th>Pillar</th><th>Definition</th><th>Depends on</th></tr></thead>
+    <tbody>
+      <tr><td>Sector Probability (<span class="ref">§5</span>)</td><td>The probability that the missing person is in sector X, from past search instances, geographic data, and current conditions</td><td>Sector definitions, external historical and geographic data</td></tr>
+      <tr><td>Mesh Coverage Data (<span class="ref">§6</span>)</td><td>The effective range from one radio hop to the next, from terrain and foliage, rendered as an overlay of where teams stay connected</td><td>Node positions (<span class="ref">§2</span>), elevation and land-cover data</td></tr>
+      <tr><td>Mission Pre-Planning (<span class="ref">§7</span>)</td><td>Routes and sectors laid out before teams leave the command post, attacking the highest-probability ground first and knowing where contact will drop</td><td>The outputs of <span class="ref">§5</span> and <span class="ref">§6</span></td></tr>
+    </tbody>
+  </table></div>
+  <p>Sector Probability and Mission Pre-Planning pair as the planning side; Mesh Coverage Data serves both planning and the live map. All three draw on the same geographic, topographic, and environmental data, which is why the data layer (<span class="ref">§3.1</span>, <span class="ref">§5.2</span>, <span class="ref">§6.2</span>) is a shared foundation rather than three separate downloads.</p>
+
+  <h3><span class="num">1.3</span>The three growth objectives in one line each</h3>
+  <p>Field User Sync (<span class="ref">§13</span>): every searcher's phone shows the other teams, the covered ground, and their own sector. Drone Extension (<span class="ref">§14</span>): a mesh radio a few hundred feet up to reach over ridges. Scrubbed Server (<span class="ref">§15</span>): after a mission, strip the personal data and keep the coverage layers so the next search in that area starts from history. None of the three is required for the pillars to work; each one is described in Part Two at the depth needed to decide whether and when to take it on.</p>
+
+  <h3><span class="num">1.4</span>Framing decisions the team can design against</h3>
+  <ul>
+    <li><strong>Not region-specific.</strong> Colorado is where we build and test because we are here and the terrain is hard. The system should serve a missing-person case in a city or in Nebraska farmland just as well. Every terrain and land-cover input in this document is a national or global dataset.</li>
+    <li><strong>Not an extension of an existing product.</strong> CalTopo, COTAK, and the Meshtastic ecosystem each solve part of the problem (<span class="ref">§8</span>). MaroonNet uses their open-source components where they exist and builds its own open-source program with capabilities they lack. Reading and writing their file formats is still worth doing because it is cheap and it is how a team adopts a new tool without abandoning its records.</li>
+    <li><strong>Ship one thing that works before starting the next.</strong> Rank the pillars, build and validate one until it is usable, then move to the next. The live map with sector coverage is the first demonstrable piece; the probability model is the piece that makes the pitch different.</li>
+    <li><strong>Lower cost, easier to use, and generalizable.</strong> That is the differentiation against ATAK's learning curve and against subscription trackers. It is a design constraint on every piece below: no command line for the operator, one install, stock radios.</li>
+  </ul>
+</section>
+
+<section id="s2">
+  <h2><span class="num">2</span>Radio and mesh layer</h2>
+  <p>Each searcher's node reports position and time over the mesh; the gateway node at the command post collects them. The radio is a collection sensor for time and location. It is not the storage or analysis point; those live on the laptop (<span class="ref">§3</span>, <span class="ref">§4</span>).</p>
+
+  <h3><span class="num">2.1</span>Platform facts</h3>
+  <div class="tablewrap"><table>
+    <thead><tr><th>Item</th><th>Answer</th></tr></thead>
+    <tbody>
+      <tr><td>Firmware</td><td>C++ on the Arduino framework, built with PlatformIO. Targets ESP32, nRF52, RP2040/RP2350, and Linux (<code>meshtasticd</code>, a native build for a Raspberry Pi or similar with a LoRa HAT).</td></tr>
+      <tr><td>License</td><td>GPL-3.0 across firmware, Python library, Android app, Apple app, and web client. Importing the Python library into an MIT project would create a license conflict at distribution, so the repo is GPL-3.0 to match.</td></tr>
+      <tr><td>Latest stable</td><td>2.7.26, released June 23, 2026, still current this week. Pin every node to one version and do not upgrade mid-semester.</td></tr>
+      <tr><td>Wire format</td><td>Protocol Buffers (<code>meshtastic/protobufs</code>). Every packet, config message, and phone-to-radio message is a protobuf, with generated bindings for Python, TypeScript, Kotlin, Swift, and C++.</td></tr>
+      <tr><td>Host access</td><td>Each radio exposes a "PhoneAPI" over USB serial, Bluetooth LE, and TCP (port 4403 when the node has Wi-Fi). Anything that speaks that protocol reads every packet the node hears and can send packets into the mesh.</td></tr>
+      <tr><td>Routing</td><td>Managed flooding. Every node that hears a broadcast rebroadcasts it once until the hop limit (default 3) runs out, so every node's database fills with every other node's position. There is no central server anywhere in the mesh.</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3><span class="num">2.2</span>Existing official client stacks</h3>
+  <p>Writing code on top of the radios is the intended path. Four official stacks exist today, and each is a starting point we can iterate on as our own under GPL-3.0.</p>
+  <div class="tablewrap"><table>
+    <thead><tr><th>Client</th><th>Language</th><th>Transports</th><th>How we use it</th></tr></thead>
+    <tbody>
+      <tr><td><code>meshtastic</code> Python library and CLI</td><td>Python</td><td>Serial, BLE, TCP</td><td>Mature, documented, on PyPI. The host-side library for the command post daemon (<span class="ref">§3.1</span>).</td></tr>
+      <tr><td><code>@meshtastic/sdk</code> and <code>@meshtastic/core</code> (the <code>meshtastic/web</code> monorepo)</td><td>TypeScript</td><td>Web Serial, Web Bluetooth, HTTP in browsers; TCP and serial under Node or Deno</td><td>Powers the official web client; the basis for a browser-only field client (<span class="ref">§13.3</span>).</td></tr>
+      <tr><td><code>meshtastic-sdk</code> (new in 2026, pre-1.0)</td><td>Kotlin Multiplatform</td><td>BLE, TCP, USB serial on Android, JVM, and iOS</td><td>Published to Maven Central. Handles handshake, node database sync, ACK correlation, retries. The first official route to one codebase for Android and iOS (<span class="ref">§13.3</span>).</td></tr>
+      <tr><td>Meshtastic-Android, Meshtastic-Apple</td><td>Kotlin (Compose), Swift (SwiftUI, SwiftData)</td><td>BLE, TCP, serial</td><td>The stock apps. Both show every node on a map, support offline tiles, waypoints, and messaging. Used as-is by field members until <span class="ref">§13</span> is built.</td></tr>
+    </tbody>
+  </table></div>
+  <p>Code can also go inside the firmware as a C++ <code>MeshModule</code>; Store &amp; Forward, NeighborInfo, and the CalTopo serial mode were added that way. The stronger capstone position is stock firmware only: teams run whatever hardware they own, and a system that needs reflashed radios is much harder to hand to volunteers. Revisit only if something cannot be done from the laptop side (<span class="ref">§2.4</span>).</p>
+
+  <h3><span class="num">2.3</span>What the radios already provide</h3>
+  <p>The position and telemetry packets carry everything the live map and the coverage math need, decoded for us by the Python library. No firmware work is required for Part One.</p>
+  <div class="tablewrap"><table>
+    <thead><tr><th>Field</th><th>What it is</th></tr></thead>
+    <tbody>
+      <tr><td><code>latitude_i</code>, <code>longitude_i</code></td><td>Integer degrees × 10<sup>7</sup></td></tr>
+      <tr><td><code>altitude</code></td><td>Meters</td></tr>
+      <tr><td><code>time</code></td><td>Unix seconds from the node's GPS or synced clock</td></tr>
+      <tr><td><code>precision_bits</code></td><td>How much the node has blurred its own position (a per-channel privacy setting)</td></tr>
+      <tr><td><code>sats_in_view</code>, <code>ground_speed</code>, <code>ground_track</code></td><td>Optional; depend on GPS module and configuration</td></tr>
+      <tr><td>Packet header</td><td><code>from</code>, <code>to</code>, <code>id</code>, <code>hop_start</code>, <code>hop_limit</code>, <code>relay_node</code>, <code>next_hop</code>, <code>rx_snr</code>, <code>rx_rssi</code>, <code>want_ack</code></td></tr>
+      <tr><td>Device telemetry</td><td><code>battery_level</code>, <code>voltage</code>, <code>channel_utilization</code>, <code>air_util_tx</code>, <code>uptime_seconds</code></td></tr>
+    </tbody>
+  </table></div>
+  <p>Log every one of these fields for every packet from the first day. Signal quality, hop counts, and relay bytes are what the coverage validation (<span class="ref">§6.5</span>) and any topology view depend on, and they cannot be reconstructed later.</p>
+
+  <h3><span class="num">2.4</span>Firmware gaps and workarounds</h3>
+  <div class="tablewrap"><table>
+    <thead><tr><th>Gap</th><th>Why it matters</th><th>Workaround now</th></tr></thead>
+    <tbody>
+      <tr><td>No track memory on the node</td><td>A searcher out of mesh range for 20 minutes leaves a hole in the coverage record; the node does not replay missed positions on reconnect</td><td>Flag the gap on the map and in the coverage math; never interpolate. Store-and-forward for positions is a plausible upstream contribution after EXPO.</td></tr>
+      <tr><td>Store &amp; Forward stores text only</td><td>Same as above</td><td>Same</td></tr>
+      <tr><td>About 233 bytes of payload per packet</td><td>No polygons to field devices; a Waypoint is one point</td><td>Push a sector's centroid and label as a Waypoint (<span class="ref">§7.4</span>); full polygons need a custom field app (<span class="ref">§13</span>)</td></tr>
+      <tr><td>Traceroute limited to one per 30 seconds</td><td>Active topology discovery is slow and costs airtime</td><td>Build topology passively from <code>relay_node</code> and hop counts in every packet header</td></tr>
+      <tr><td>Congestion throttling at 25% and 40% channel utilization; interval scaling above 40 nodes</td><td>Silence is often normal, not failure</td><td>Any "node went quiet" logic must treat throttling as a cause (<span class="ref">§2.6</span>)</td></tr>
+      <tr><td>Public-key encryption on direct messages</td><td>The command post cannot message a node whose key it has not heard</td><td>Provision field nodes from the command post over USB (<span class="ref">§9</span>); broadcast on the channel by default</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3><span class="num">2.5</span>Hardware and cost</h3>
+  <div class="tablewrap"><table>
+    <thead><tr><th>Item</th><th>Approximate cost</th><th>Notes</th></tr></thead>
+    <tbody>
+      <tr><td>Heltec WiFi LoRa 32 V4 (gateway)</td><td>$25–40</td><td>ESP32-S3, SX1262, native USB, Wi-Fi TCP API; a 28 dBm high-power variant exists</td></tr>
+      <tr><td>LILYGO T-Beam Supreme (field)</td><td>$50–70</td><td>GPS, 18650 battery slot, 8 MB PSRAM, microSD</td></tr>
+      <tr><td>915 MHz antenna upgrade</td><td>$10–40 each</td><td>Stock whips are poor; a 3–5 dBi antenna is the cheapest range improvement available</td></tr>
+      <tr><td>Batteries and chargers</td><td>$5–10 each</td><td>Field nodes should run 8+ hours</td></tr>
+      <tr><td>Raspberry Pi + LoRa HAT running <code>meshtasticd</code></td><td>$60–100</td><td>Alternative gateway: Linux-native, Ethernet or Wi-Fi to the laptop, and it doubles as a fixed relay on a mast</td></tr>
+      <tr><td>Mast relay (30–40 ft, solar node)</td><td>$50–200</td><td>Standard practice in the Meshtastic community; the ground-based form of the drone idea (<span class="ref">§14.3</span>) and it feeds the same coverage model</td></tr>
+      <tr><td>Radio licenses</td><td>$0</td><td>915 MHz ISM band under FCC Part 15; no operator license; +30 dBm ERP maximum</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3><span class="num">2.6</span>The airtime ceiling</h3>
+  <p>The default LongFast preset moves about 1 kbit/s. A 50-byte position packet occupies roughly 0.64 seconds of air, and every node within range rebroadcasts it. Ten nodes sending positions every 60 seconds, each rebroadcast twice, use about 19 minutes of airtime per hour, roughly 32% of the channel, already above the 25% polite threshold at which the firmware starts delaying sends. The same mesh on MediumFast uses about 9%. This answers the design question "how many nodes can share the mesh before reporting slows down": it depends on preset and interval, and the answer should be shown on the dashboard live (<span class="ref">§9</span>, airtime model). Preset and interval choices are engineering decisions, not defaults.</p>
+  <p>Open items to close with hardware in hand: whether the Heltec V4 GPS acquires reliably after flashing (a quirk has been reported); whether a gateway on the Python API needs its own GPS lock to relay others (CalTopo's serial mode does; expected not); and real-world range in Front Range terrain with stock versus upgraded antennas.</p>
+</section>
+
+<section id="s3">
+  <h2><span class="num">3</span>Command post application</h2>
+  <p>Receives mesh data from the gateway, displays live positions on a browser map, stores everything, and replays the search afterward. Runs as a web application so any commander's laptop can host it.</p>
+
+  <h3><span class="num">3.1</span>Building blocks</h3>
+  <div class="tablewrap"><table>
+    <thead><tr><th>Block</th><th>Status</th><th>What we use</th><th>Language</th><th>Notes</th></tr></thead>
+    <tbody>
+      <tr><td>Radio I/O</td><td>Exists</td><td><code>meshtastic</code> Python library</td><td>Python</td><td>Integrate (<span class="ref">§2.2</span>)</td></tr>
+      <tr><td>Bridge daemon (decode, log, publish)</td><td>Build</td><td>asyncio + PyPubSub</td><td>Python</td><td>Thin; the library hands us a dictionary per packet</td></tr>
+      <tr><td>Database layer</td><td>Exists</td><td><code>sqlite3</code> standard library; optional SQLAlchemy</td><td>Python, SQL</td><td>Build the schema (<span class="ref">§4</span>)</td></tr>
+      <tr><td>API server (REST + WebSocket)</td><td>Exists</td><td>FastAPI + uvicorn</td><td>Python</td><td>Build the endpoints</td></tr>
+      <tr><td>Offline map tiles</td><td>Exists</td><td>Planetiler (OpenStreetMap to MBTiles or PMTiles)</td><td>Java tool, run once</td><td>Hours of build time per state (<span class="ref">§3.2</span>)</td></tr>
+      <tr><td>Elevation</td><td>Exists</td><td>USGS 3DEP, 10 m and 30 m DEM, free</td><td>GeoTIFF</td><td>Contours via GDAL; also the input to <span class="ref">§6</span></td></tr>
+      <tr><td>Land cover and canopy</td><td>Exists</td><td>NLCD (30 m, US), NLCD Tree Canopy Cover, ESA WorldCover (10 m, global)</td><td>GeoTIFF</td><td>The satellite land-cover classification the design doc names as a goal; USGS and ESA have already produced it</td></tr>
+      <tr><td>Map rendering</td><td>Exists</td><td>MapLibre GL JS</td><td>TypeScript</td><td>Integrate</td></tr>
+      <tr><td>Frontend framework</td><td>Exists</td><td>React with Vite</td><td>TypeScript</td><td>Build the UI</td></tr>
+      <tr><td>Analytics</td><td>Exists</td><td>numpy, Shapely, NetworkX, rasterio, pyproj, geopandas</td><td>Python</td><td>Build the three pillars on top</td></tr>
+      <tr><td>Packaging</td><td>Exists</td><td>PyInstaller</td><td>Python</td><td>GitHub Actions matrix for Windows, macOS, Linux</td></tr>
+      <tr><td>Simulation</td><td>Exists</td><td>Meshtasticator (discrete-event), <code>meshtasticd</code> (real firmware, no radio)</td><td>Python, C++</td><td>Lets four people develop without the hardware</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3><span class="num">3.2</span>Offline maps</h3>
+  <p>An online map API (Google Maps, Mapbox, MapTiler) is exactly what cannot be used at a trailhead. Offline means the tiles are on disk before the mission. Planetiler turns an OpenStreetMap extract into vector tiles for a whole state in one run, a few gigabytes for Colorado at zoom 10–16. Vector tiles render at any zoom from one dataset, which is the reason to prefer MapLibre over a raster-first library. Add USGS 3DEP contours as a second tile layer so the map reads like the topo maps SAR people already use. Because OpenStreetMap, 3DEP, and NLCD cover the whole country, the same pipeline produces tiles for any state; nothing in the map layer is Colorado-specific.</p>
+  <p>What must be on the laptop ahead of time: the vector tile file for the region, the contour tiles, and, for the pillars, the DEM and land-cover rasters clipped to the working area. The application should let the operator pick a region at first run and download it while connected.</p>
+
+  <h3><span class="num">3.3</span>Language trade-offs</h3>
+  <div class="tablewrap"><table>
+    <thead><tr><th>Layer</th><th>Option</th><th>Strength</th><th>Weakness</th><th>Verdict</th></tr></thead>
+    <tbody>
+      <tr><td>Backend</td><td>Python</td><td>The only official Meshtastic host library; numpy, Shapely, NetworkX; the team can hold it in their heads</td><td>Slower; PyInstaller binaries run 100–200 MB</td><td>Use it. The radio library decides this.</td></tr>
+      <tr><td>Backend</td><td>Node / TypeScript</td><td>Same language as the frontend; <code>@meshtastic/core</code> exists</td><td>Weak geospatial and numeric ecosystem</td><td>No, unless analytics move to Python anyway</td></tr>
+      <tr><td>Backend</td><td>Go or Rust</td><td>Small, fast single binaries</td><td>No official Meshtastic library; the PhoneAPI would be reimplemented</td><td>No for a capstone</td></tr>
+      <tr><td>Frontend</td><td>React + MapLibre</td><td>Largest ecosystem, offline vector tiles, WebGL performance</td><td>Bundle size; MapLibre style spec has a learning curve</td><td>Use it</td></tr>
+      <tr><td>Frontend</td><td>Leaflet</td><td>Simplest possible map</td><td>Raster-first; weak for large overlays and vector tiles</td><td>Weekend prototype only</td></tr>
+      <tr><td>Frontend</td><td>OpenLayers</td><td>Strongest raw GIS features in a browser</td><td>Heavier API, smaller React ecosystem</td><td>Only if MapLibre lacks a needed projection or raster tool</td></tr>
+      <tr><td>Desktop shell</td><td>Browser tab served by FastAPI</td><td>Zero extra tooling; works on any laptop</td><td>No native menus or file dialogs beyond the browser's</td><td>Use it</td></tr>
+      <tr><td>Desktop shell</td><td>Tauri (Rust) or Electron</td><td>Native window, auto-update</td><td>Extra build system; Electron is huge; Tauri adds Rust</td><td>Later, if teams ask</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3><span class="num">3.4</span>Already glued versus must be built</h3>
+  <p>Already glued: the Python library calls back into the daemon with a dictionary per packet; FastAPI talks to the browser over standard HTTP and WebSocket; MapLibre reads MBTiles or PMTiles from a static route; Shapely emits GeoJSON natively.</p>
+  <p>Must be built: the daemon; the schema (<span class="ref">§4</span>); the WebSocket message contract; every overlay (coverage grid, per-sector coverage numbers, mesh-coverage raster, probability surface, planned routes); the "node went quiet" alert logic; import and export mappers (<span class="ref">§9</span>); the provisioning UI. Four people building these in parallel without a written interface contract is the classic capstone failure, so the schema and message set get written before parallel work starts.</p>
+
+  <h3><span class="num">3.5</span>Coverage and replay</h3>
+  <p>The design doc asks how "coverage" is defined for the coverage map: the track alone, or the track plus a width on either side. The answer from search theory is the second: coverage is the track length times an effective sweep width (how far to each side a searcher of a given type reliably detects the subject in that terrain), divided by the sector area. Sweep width is a per-team-type, per-terrain input the incident commander can edit; the numbers themselves must come from practitioners (<span class="ref">§12</span>). Replay needs only the append-only history (<span class="ref">§4.2</span>): read the database at time T and redraw.</p>
+</section>
+
+<section id="s4">
+  <h2><span class="num">4</span>Live mission storage</h2>
+
+  <h3><span class="num">4.1</span>One file per mission</h3>
+  <p>Not a cloud database. The application's value is that it works at a trailhead with no signal, so anything requiring a network on the live path is a liability. The right shape is one SQLite file per mission on the command post laptop. Long-term, cross-mission storage is a different system with different rules and is covered under the Scrubbed Server (<span class="ref">§15</span>).</p>
+  <div class="tablewrap"><table>
+    <thead><tr><th>Requirement</th><th>SQLite</th><th>PostgreSQL + PostGIS</th><th>Cloud (RDS, DynamoDB, Firebase)</th></tr></thead>
+    <tbody>
+      <tr><td>Works with no network</td><td>Yes</td><td>Yes, if installed locally</td><td>No</td></tr>
+      <tr><td>Zero install for a volunteer</td><td>Yes; in Python's standard library, ships inside the binary</td><td>No; a server process</td><td>No</td></tr>
+      <tr><td>Mission is one portable file</td><td>Yes</td><td>No (dump and restore)</td><td>No</td></tr>
+      <tr><td>Replay and after-action review</td><td>Read the file at time T</td><td>Fine</td><td>Fine</td></tr>
+      <tr><td>Spatial queries</td><td>In-process via Shapely, or the SpatiaLite extension</td><td>Native, excellent</td><td>Varies</td></tr>
+      <tr><td>Cost</td><td>$0</td><td>$0</td><td>$5–50 per month plus egress</td></tr>
+      <tr><td>Concurrent writers</td><td>One process (fine: one daemon)</td><td>Many</td><td>Many</td></tr>
+    </tbody>
+  </table></div>
+  <p>Geometry work (track-in-polygon intersection, buffering a track by sweep width, rasterizing coverage) runs in Python with Shapely and numpy, so the database itself does not need to be spatial. Consider making the mission file a <strong>GeoPackage</strong> (<code>.gpkg</code>): a SQLite file with a standardized schema for feature tables and rasters. It costs nothing because we are already in SQLite, and QGIS, GDAL, and every geospatial tool open it directly, which gives the mission archive export for free. Our own tables sit alongside the standard ones.</p>
+
+  <h3><span class="num">4.2</span>Two rules that cannot be retrofitted</h3>
+  <ul>
+    <li><strong>Append-only history.</strong> Positions, telemetry, packets, sector assignments, and events are inserted, never updated in place. Current state is a query over history. Replay is then just a read of the past; if state is overwritten, replay cannot be built later.</li>
+    <li><strong>Two timestamps per row.</strong> The device's reported time and the command post's receive time. Field clocks drift; order by receive time, display device time.</li>
+  </ul>
+
+  <h3><span class="num">4.3</span>Retention and access</h3>
+  <p>Store everything for the mission (replay needs it), keep the file on the command post laptop only, let the operator delete it, and never expose the local API on a network interface without authentication. Write this down as a decision before the first packet is stored. It is also the boundary the Scrubbed Server (<span class="ref">§15.3</span>) must respect.</p>
+</section>
+
+<section id="s5">
+  <h2><span class="num">5</span>Pillar one: Sector Probability</h2>
+  <p>Definition: the probability that the missing person will be found in sector X. Output: a probability per sector, giving the command post a ranked picture of where to send teams first. This is the piece that makes the pitch different, and it has one roadblock the team has not yet hit: the historical data.</p>
+
+  <h3><span class="num">5.1</span>The science that already exists</h3>
+  <p>Bayesian search theory is about eighty years old and well validated; the team should not claim to invent new search math. Current field practice is outdated in a specific way: probabilities are estimated by hand from published tables, and the results are typed into a mapping tool as sector overlays. There is no automated pipeline. The defensible novelty is to compute the probability surface directly from terrain, land cover, historical statistics, and current conditions, keep it as a live grid-level posterior that updates as searchers cover ground, and hand it to the planner (<span class="ref">§7</span>) automatically.</p>
+
+  <h3><span class="num">5.2</span>Data inputs and availability</h3>
+  <div class="tablewrap"><table>
+    <thead><tr><th>Data need</th><th>Source</th><th>Open?</th><th>Notes</th></tr></thead>
+    <tbody>
+      <tr><td>Historical lost-person outcomes (distance from the initial planning point by subject category, find-location type, mobility, survival)</td><td>ISRID, the International Search &amp; Rescue Incident Database, curated by Robert Koester (dbS Productions); roughly 300,000 incidents</td><td><strong>No.</strong> Summary statistics are published in <em>Lost Person Behavior</em> (2008; second edition in progress). The raw database is not public; researchers get access by arrangement.</td><td>The most important single fact in this section. See <span class="ref">§5.3</span>.</td></tr>
+      <tr><td>Published models built on ISRID</td><td>Distance-ring model; Doke's watershed model (2012); the MapScore combined model (Sava, Twardy, Koester 2016); Virginia Tech agent-based model (2022)</td><td>Papers yes; some code (SARBayes project)</td><td>These are what the first version implements. None require our own incident data.</td></tr>
+      <tr><td>Terrain (elevation, slope)</td><td>USGS 3DEP</td><td>Yes</td><td>National; shared with <span class="ref">§6</span></td></tr>
+      <tr><td>Land cover and canopy</td><td>NLCD, NLCD Tree Canopy Cover, ESA WorldCover</td><td>Yes</td><td>National and global; shared with <span class="ref">§6</span></td></tr>
+      <tr><td>Trails, roads, water, buildings</td><td>OpenStreetMap</td><td>Yes</td><td>Global; also covers the urban missing-person case</td></tr>
+      <tr><td>Watersheds</td><td>USGS Watershed Boundary Dataset</td><td>Yes</td><td>Needed for the watershed model</td></tr>
+      <tr><td>Weather and warnings</td><td>NWS API (<code>api.weather.gov</code>): alerts, forecasts, observations</td><td>Yes, free, no key</td><td>Cold, storms, and visibility change both where people go and how long they survive</td></tr>
+      <tr><td>Wildfire perimeters and hotspots</td><td>NIFC open data (perimeters); NASA FIRMS (satellite hotspots)</td><td>Yes</td><td>Blocks sectors and changes routes</td></tr>
+      <tr><td>Flooding</td><td>NWS river forecasts; USGS stream gauges; FEMA flood layers</td><td>Yes</td><td>Same</td></tr>
+      <tr><td>Avalanche</td><td>Avalanche.org and regional centers (CAIC in Colorado) forecast APIs</td><td>Yes</td><td>The same interface works for any state's center</td></tr>
+      <tr><td>Earthquake</td><td>USGS earthquake feeds</td><td>Yes</td><td>Rare here; trivial to include</td></tr>
+      <tr><td>Local incident history for a specific county</td><td>The team's own records, if shared</td><td>Case by case; privacy</td><td>What the Scrubbed Server (<span class="ref">§15</span>) would eventually collect</td></tr>
+    </tbody>
+  </table></div>
+  <p>Every current-conditions feed requires internet at planning time. That is acceptable: planning happens before deployment, often at the station, and conditions are cached into the mission file (<span class="ref">§4</span>) so the offline map still shows them.</p>
+
+  <h3><span class="num">5.3</span>The model to build first</h3>
+  <p>A model that <em>trains</em> on incident data is not feasible in the capstone timeline because the training data is not available. A model that <em>implements</em> the published ring and watershed models from ISRID's published tables on open terrain data, then layers current conditions on top, is feasible, defensible, and already validated in the literature: on the MapScore metric, where a random map scores 0 and a perfect map 1, the ring model alone scores about 0.78 and the ring-plus-watershed combination about 0.81. That is the version to design first. The learning version becomes possible once the Scrubbed Server and the consent process exist (<span class="ref">§15</span>), which is after EXPO. The team's comfort with ML coursework is not wasted; it is what makes the second version credible, and it applies now to the evaluation harness (<span class="ref">§5.5</span>).</p>
+  <p>Inputs to the first version, concretely: subject category (from the initial call), initial planning point, elevation and slope, land cover, trail and road network, watershed boundaries, and any active hazard polygons. Output: a probability raster over the working area, then summed per sector.</p>
+
+  <h3><span class="num">5.4</span>Sector definitions</h3>
+  <p>The design doc asks how the search area is divided in the first place. Three sources, all of which the application should accept, because the probability surface is a raster and can be summed over any polygon:</p>
+  <ul>
+    <li>Drawn by the incident commander on the map (minimal polygon tool).</li>
+    <li>Imported from another tool as GeoJSON or KML (<span class="ref">§9</span>).</li>
+    <li>Generated: the planner (<span class="ref">§7.3</span>) proposes sectors from the probability surface, terrain breaks, and trails; the commander edits them.</li>
+  </ul>
+  <p>Whether the probability updates during the search: yes. As coverage accumulates in a sector (<span class="ref">§3.5</span>), the posterior for that sector falls by the fraction searched, and remaining probability re-ranks the open sectors. This is the "live grid-level posterior" from the September 3 discussion, and it is the same coverage math the live map already computes.</p>
+
+  <h3><span class="num">5.5</span>Validation</h3>
+  <p>The design doc asks how the team would know the probabilities are any good. Three tiers: sanity checks (probability sums to one, hazards zero out blocked cells, the surface moves the right way when inputs change); MapScore-style scoring against any historical cases a partner team shares, which is the standard the literature uses; and a planted-subject exercise where the team places a "subject" according to the published statistics and measures where the model ranked that sector. The first tier is free, the second needs one practitioner relationship, and the third is a day outdoors.</p>
+
+  <h3><span class="num">5.6</span>Libraries</h3>
+  <div class="tablewrap"><table>
+    <thead><tr><th>Piece</th><th>Status</th><th>Language</th><th>Notes</th></tr></thead>
+    <tbody>
+      <tr><td>Raster math over the working area</td><td>Exists</td><td>Python: numpy, rasterio, scipy</td><td>Distance rings, slope, canopy penalties, hazard masks</td></tr>
+      <tr><td>Watershed and network features</td><td>Exists</td><td>Python: geopandas, Shapely, WBD polygons</td><td></td></tr>
+      <tr><td>Published statistical models</td><td>Build (from papers)</td><td>Python</td><td>Small code; the value is in the sourcing and the evaluation</td></tr>
+      <tr><td>Hazard feed clients</td><td>Build (thin)</td><td>Python: requests</td><td>Each feed is a JSON or GeoJSON endpoint; cache into the mission file</td></tr>
+      <tr><td>Machine-learning layer (future)</td><td>Exists</td><td>Python: scikit-learn, PyTorch</td><td>Only once training data exists (<span class="ref">§15.4</span>)</td></tr>
+      <tr><td>Evaluation</td><td>Build</td><td>Python</td><td>MapScore implementation and the planted-subject protocol</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<section id="s6">
+  <h2><span class="num">6</span>Pillar two: Mesh Coverage Data</h2>
+  <p>Definition: the effective range from one radio hop to the next, based on terrain and foliage. Output: a coverage overlay showing where teams stay connected and where the mesh drops out. This is the best-understood piece in the project because the inputs are free and the math is closed-form until full propagation models.</p>
+
+  <h3><span class="num">6.1</span>What each data source actually provides</h3>
+  <div class="tablewrap"><table>
+    <thead><tr><th>Source</th><th>Provides</th><th>Does not provide</th></tr></thead>
+    <tbody>
+      <tr><td>OpenStreetMap</td><td>Trails, roads, water, buildings, land-use polygons (forest, residential, farmland), place names. The base map.</td><td>Elevation (OSM has none); per-pixel canopy density; consistent land cover in rural areas</td></tr>
+      <tr><td>USGS 3DEP</td><td>Elevation at 10 m (most of Colorado) and 30 m (all of the US). The input to line-of-sight and Fresnel calculations.</td><td>Anything above the ground surface</td></tr>
+      <tr><td>NLCD and NLCD Tree Canopy Cover</td><td>30 m land-cover classes and percent canopy across the US. The foliage input.</td><td>Tree height; seasonal leaf state</td></tr>
+      <tr><td>ESA WorldCover</td><td>10 m global land cover. Finer than NLCD and works outside the US.</td><td>Canopy percentage</td></tr>
+      <tr><td>USGS 3DEP lidar (where flown)</td><td>Point clouds from which canopy height can be derived</td><td>Coverage is patchy; large files; a refinement, not a first-version input</td></tr>
+    </tbody>
+  </table></div>
+  <p>All of these are free, offline-usable rasters and vectors once downloaded and clipped to the working area (<span class="ref">§3.2</span>). None is Colorado-specific.</p>
+
+  <h3><span class="num">6.2</span>From terrain between two points to "can they hear each other"</h3>
+  <p>The algorithm, in the order it is built:</p>
+  <ol>
+    <li>Sample the DEM over the working area into a grid (30 m, or 10 m where available).</li>
+    <li>For each transmitter (the gateway, any relay, or a candidate site) and each grid cell, sample the terrain profile along the straight line between them and test line-of-sight, adding antenna heights at both ends. A handheld is about 1.5 m; a gateway on a mast 2–6 m; a drone relay is simply a large antenna height (<span class="ref">§14.1</span>).</li>
+    <li>Compute first-Fresnel-zone clearance along the profile. Sixty percent clearance is "clear"; partial clearance is "marginal."</li>
+    <li>Compute the link budget: transmit power plus antenna gains, minus free-space path loss at 915 MHz, minus a foliage penalty per vegetated meter of path (published dB-per-meter figures for 900 MHz), minus a diffraction estimate for shadowed cells. Compare with the receiver sensitivity of the preset in use.</li>
+    <li>Classify each cell as covered, marginal, or shadow for each transmitter; union across transmitters for the mesh overlay.</li>
+  </ol>
+  <p>The design doc asks whether the overlay is computed before the search for planned node positions, live as nodes move, or both. Both, from the same code: pre-planning runs it for candidate relay sites and expected team routes (<span class="ref">§7.2</span>); the live map re-runs it for the current node positions. It is a numpy loop over data already loaded, roughly 40,000 cells by 200 profile samples for a 30-square-mile area, and it runs in seconds.</p>
+
+  <h3><span class="num">6.3</span>Pieces to build</h3>
+  <div class="tablewrap"><table>
+    <thead><tr><th>Piece</th><th>Status</th><th>Language</th><th>Notes</th></tr></thead>
+    <tbody>
+      <tr><td>Line-of-sight over the DEM</td><td>Build (simple)</td><td>Python, numpy</td><td>The first, one-week version</td></tr>
+      <tr><td>Fresnel clearance and link budget</td><td>Build (simple)</td><td>Python</td><td>Closed-form; the second version</td></tr>
+      <tr><td>Foliage attenuation</td><td>Build</td><td>Python</td><td>Per-cell penalty from canopy cover</td></tr>
+      <tr><td>Relay placement suggestion</td><td>Build</td><td>Python</td><td>Greedy pass over ridge and road-accessible cells; pick the site that adds the most covered search area; show the top three. Feeds <span class="ref">§7</span> and <span class="ref">§14</span>.</td></tr>
+      <tr><td>Full ITM / Longley-Rice</td><td>Exists</td><td>SPLAT! (C++); Meshtastic Site Planner (WebAssembly)</td><td>Validate against it; do not reimplement</td></tr>
+      <tr><td>Overlay rendering</td><td>Build</td><td>TypeScript, MapLibre</td><td>Semi-transparent raster layer; stored with the mission for replay</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3><span class="num">6.4</span>Accuracy required</h3>
+  <p>The overlay is a planning aid, not ground truth. It needs to be right often enough that an incident commander trusts "you will lose contact past that ridge" and plans a voice check-in. A reasonable target is that predicted class (covered, marginal, shadow) agrees with observed reception at least three times in four, with disagreements explainable.</p>
+
+  <h3><span class="num">6.5</span>Validation</h3>
+  <p>Formal published validation of LoRa range prediction against measured data is thin, so we validate it ourselves. During every outdoor test, log received signal strength and signal-to-noise ratio at the gateway for every position packet (<span class="ref">§2.3</span>) and compare against the predicted class for that cell. That log becomes the validation dataset, and nobody else has one for SAR terrain. Also compare our overlay against the Meshtastic Site Planner's output for the same gateway site and note the differences.</p>
+</section>
+
+<section id="s7">
+  <h2><span class="num">7</span>Pillar three: Mission Pre-Planning</h2>
+  <p>Definition: plan routes and sectors for the most efficient search before teams leave the command post. Inputs: the probability surface (<span class="ref">§5</span>) and the coverage overlay (<span class="ref">§6</span>). Output: where teams go, in what order, and where they will lose radio contact, so teams get out faster with a clear path set ahead of them. No existing tool automates this step (<span class="ref">§8</span>); it is where the pillars become a product.</p>
+
+  <h3><span class="num">7.1</span>What "most efficient" means</h3>
+  <p>The design doc asks whether efficient means highest-probability first, shortest travel, staying in mesh coverage, or a weighted mix. It is a weighted mix, and the weights should be visible and adjustable by the commander rather than hidden in code. The standard objective from search theory is to maximize probability of success per unit of effort: send each team where remaining probability divided by the time it costs to search there is highest. The terms in that ratio are:</p>
+  <ul>
+    <li>Remaining probability in the sector (<span class="ref">§5.4</span>).</li>
+    <li>Time to search it: sector area divided by the team's sweep width and pace, adjusted for slope and land cover.</li>
+    <li>Time to reach it: travel from the command post or trailhead along trails and roads (a shortest-path over the OpenStreetMap network), adjusted for slope.</li>
+    <li>Contact risk: fraction of the sector and the approach in predicted shadow (<span class="ref">§6.2</span>). This does not forbid the sector; it schedules a check-in or a relay.</li>
+    <li>Hazard: sectors intersecting an active hazard polygon (<span class="ref">§5.2</span>) are excluded or deferred.</li>
+  </ul>
+
+  <h3><span class="num">7.2</span>Generated versus drawn</h3>
+  <p>Generate a ranked plan; let the commander edit everything. The first version can be almost entirely ranking plus overlays: here are the sectors in priority order, here is the approach for each, here is where contact drops, here are the three relay sites that would fix it. Route generation inside a sector (parallel sweep lines at the sweep width spacing) is a small addition once the ranking exists. Anything more automated than that should wait for practitioner feedback; incident commanders will not accept a plan they cannot see the reasoning for.</p>
+
+  <h3><span class="num">7.3</span>Sector generation</h3>
+  <p>When no sectors are imported or drawn, the planner can propose them: split the working area along ridgelines, drainages, trails, and roads (all present in 3DEP and OpenStreetMap), size them to what one team searches in one operational period, and label them. This is the "generated" option in <span class="ref">§5.4</span> and it is optional in the first version.</p>
+
+  <h3><span class="num">7.4</span>How the plan reaches the field</h3>
+  <div class="tablewrap"><table>
+    <thead><tr><th>Channel</th><th>Available now</th><th>Notes</th></tr></thead>
+    <tbody>
+      <tr><td>Printed assignment sheet with a map inset</td><td>Yes</td><td>The format teams use today; a PDF export per assignment is cheap and expected</td></tr>
+      <tr><td>Shown on the command post map</td><td>Yes</td><td>The plan is a layer like any other</td></tr>
+      <tr><td>Waypoint to the field radio</td><td>Yes</td><td>Sector centroid and label as a Meshtastic Waypoint; appears on the stock phone app (<span class="ref">§2.4</span>)</td></tr>
+      <tr><td>Sector polygon and route on the field phone</td><td>No</td><td>Requires Field User Sync (<span class="ref">§13</span>)</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3><span class="num">7.5</span>Measuring time saved</h3>
+  <p>The claim is that teams get out faster. Measure it directly: time from "sectors defined" to "first team dispatched" with and without the tool, on the same scenario, in a table-top exercise with a practitioner if possible and with the team itself as the fallback. Also record how often the commander overrides the generated ranking and why; that is the feedback the model needs.</p>
+
+  <h3><span class="num">7.6</span>Pieces to build</h3>
+  <div class="tablewrap"><table>
+    <thead><tr><th>Piece</th><th>Status</th><th>Language</th><th>Notes</th></tr></thead>
+    <tbody>
+      <tr><td>Sector ranking</td><td>Build</td><td>Python</td><td>Small; the value is in the inputs from <span class="ref">§5</span> and <span class="ref">§6</span></td></tr>
+      <tr><td>Travel-time routing over trails and roads</td><td>Exists</td><td>Python: NetworkX or pyrosm/OSMnx on the OpenStreetMap graph</td><td>Slope-weighted edges; offline once the extract is loaded</td></tr>
+      <tr><td>Sweep-line route generation</td><td>Build</td><td>Python, Shapely</td><td>Second version</td></tr>
+      <tr><td>Sector generation</td><td>Build</td><td>Python, rasterio, Shapely</td><td>Optional first version</td></tr>
+      <tr><td>Plan UI and assignment export</td><td>Build</td><td>TypeScript; Python for PDF</td><td>Weighted-objective sliders; per-assignment PDF</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<section id="s8">
+  <h2><span class="num">8</span>What already exists, and what we take from it</h2>
+  <p>None of these tools is wrong, and MaroonNet does not need to be first at any single thing. It needs to combine the pieces into something a volunteer team can run in one install, and add what nobody has: probability, coverage, and a plan computed from the radios and the data.</p>
+  <div class="tablewrap"><table>
+    <thead><tr><th>Tool</th><th>What it does</th><th>What we use from it</th><th>What it does not do</th></tr></thead>
+    <tbody>
+      <tr><td>CalTopo / SARTopo</td><td>National SAR mapping standard: segments, assignments, ICS forms, track upload, offline base layers. A paid desktop mode can show Meshtastic positions offline through a fragile command-line setup.</td><td>Its file formats (GeoJSON, KML, GPX) as import and export, so a team adopts MaroonNet without losing its records</td><td>Live coverage from the mesh; probability modeling; predicted radio coverage; automated planning; anything pushed back to the mesh</td></tr>
+      <tr><td>COTAK / ATAK</td><td>Colorado's state TAK program running on the Android Team Awareness Kit; field-to-field awareness over Meshtastic via a plugin</td><td>Proof that the field-awareness use case is real; the Cursor-on-Target format if we ever bridge to TAK</td><td>Colorado-specific program; Android only; institutional server setup; high learning curve for volunteers</td></tr>
+      <tr><td>Meshtastic apps (Android, iOS, web)</td><td>Node map, messages, waypoints, offline tiles on a phone paired to a radio</td><td>Used as-is for field members; the SDKs behind them for <span class="ref">§13</span></td><td>Command view, sectors, analytics</td></tr>
+      <tr><td>MeshCore SAR / MeshCore-TEAM</td><td>Phone-based team tracking with sector sharing</td><td>Design reference for <span class="ref">§13</span></td><td>Requires reflashing radios to a different firmware; no command post analytics</td></tr>
+      <tr><td>MeshDash, MeshMonitor, MeshSense</td><td>Self-hosted node dashboards: monitoring, ACK tracking, traceroute topology</td><td>Design reference for node health and delivery status</td><td>No SAR workflow; no coverage or probability</td></tr>
+      <tr><td>Meshtastic Site Planner</td><td>RF coverage prediction with SPLAT!'s ITM model in the browser</td><td>Validation target for <span class="ref">§6.5</span></td><td>Not tied to search assignments or planning</td></tr>
+      <tr><td>Meshtasticator, <code>meshtasticd</code></td><td>Mesh simulation with a discrete-event model or real firmware</td><td>Development without hardware; the evaluation harness</td><td>No terrain, no scripted movement; we add both</td></tr>
+      <tr><td>Garmin inReach</td><td>Satellite tracking anywhere</td><td>Nothing directly; the cost benchmark ($ per device per month) teams compare against</td><td>Needs internet at the command post; per-device subscription</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<section id="s9">
+  <h2><span class="num">9</span>Pieces not yet on the list</h2>
+  <div class="tablewrap"><table>
+    <thead><tr><th>Piece</th><th>Why it matters</th><th>Status</th><th>Notes</th></tr></thead>
+    <tbody>
+      <tr><td>Import and export formats</td><td>GeoJSON, KML, GPX. CalTopo's segment and assignment attribute names are not documented; capture a real export from a practitioner's account.</td><td>Exists</td><td>Cheap and decisive for adoption; the "imported" option in <span class="ref">§5.4</span></td></tr>
+      <tr><td>Node provisioning</td><td>Setting channel key, name, role, and position interval on field nodes from the command post over USB, with no command line</td><td>Exists (Python library, YAML config)</td><td>Build a UI; the biggest usability gap in the existing offline path</td></tr>
+      <tr><td>Airtime model</td><td>Time-on-air per preset from the Semtech formula; live channel budget on the dashboard</td><td>Build (days)</td><td>Answers the node-count question in <span class="ref">§2.6</span></td></tr>
+      <tr><td>Quiet-node alerting</td><td>A node that stops reporting goes amber, then red, with a likely cause: battery trend, signal trend, predicted shadow (<span class="ref">§6</span>), congestion</td><td>Build</td><td>Turns the coverage overlay into an operational tool</td></tr>
+      <tr><td>MQTT bridge</td><td>Nodes with Wi-Fi can publish every packet to an MQTT broker; a second way to ingest from a Wi-Fi gateway, and the path to forward positions to an online tool when the command post does have Starlink</td><td>Exists (firmware module; <code>paho-mqtt</code>)</td><td>Run a local Mosquitto broker on the laptop for the offline case</td></tr>
+      <tr><td>Time sync</td><td>Field nodes get time from GPS; the laptop clock may drift; the gateway can sync from the laptop</td><td>Exists</td><td>Two timestamps per row (<span class="ref">§4.2</span>) handles it</td></tr>
+      <tr><td>Security</td><td>Channel AES key, per-node public keys, position precision setting</td><td>Exists</td><td>Decide one SAR channel profile; never commit keys to the repo</td></tr>
+      <tr><td>Evaluation harness</td><td>Planted-clue exercise; coverage calibration; probability scoring; alert accuracy</td><td>Build</td><td>What turns the project from a demo into a result</td></tr>
+      <tr><td>Code signing</td><td>Windows SmartScreen and macOS Gatekeeper warn on unsigned binaries</td><td>Exists</td><td>Apple Developer ID ($99 per year) removes the macOS warning; Windows certificates run $100–400 per year. A volunteer will hit these warnings on first run.</td></tr>
+      <tr><td>Position-data privacy and IRB</td><td>Any exercise with outside participants collects identifiable location data</td><td>Process</td><td>Consent forms and an IRB inquiry belong before the first exercise with anyone outside the team</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<section id="s10">
+  <h2><span class="num">10</span>How the pieces connect</h2>
+<pre>Field node (T-Beam Supreme, stock firmware 2.7.26)                       §2
+   |  LoRa 915 MHz broadcast: position, telemetry, node info
+   |  (every node rebroadcasts; every node's database fills; phones show it)
+   v
+Gateway node (Heltec V4 over USB, or meshtasticd on a Pi)                §2.5
+   |  USB serial  (or TCP :4403 over Wi-Fi, or MQTT if online)
+   v
+Bridge daemon (Python: meshtastic library -> asyncio -> PyPubSub)        §3.1
+   |  writes:    packets, positions, telemetry, nodes  (append-only)     §4
+   |  publishes: position_update, telemetry_update
+   v
+Analytics workers (Python: numpy, Shapely, NetworkX, rasterio)
+   |  Sector coverage      <- tracks + sector polygons + sweep widths     §3.5
+   |  Sector probability   <- published models + terrain + OSM + hazards  §5
+   |  Mesh coverage        <- 3DEP DEM + NLCD canopy + node positions     §6
+   |  Mission plan         <- §5 + §6 + trail network + team types        §7
+   |  Quiet-node causes    <- battery, SNR, coverage raster, utilization  §9
+   v
+FastAPI (REST + WebSocket) and static files                              §3
+   |  serves: React/MapLibre console, tiles, contours, overlays, plan
+   v
+Browser on the command post laptop (and any laptop on its local Wi-Fi)
+   |  IC ranks sectors, assigns teams, messages, sends waypoints, clears alerts
+   v
+FastAPI -> daemon -> gateway -> mesh -> field node -> stock phone app     §7.4
+   (text, waypoint, probe, config; acknowledgements logged)
+
+Planning-time inputs (internet at the station, cached into the mission):  §5.2
+   NWS alerts, NIFC/FIRMS fire, river gauges, avalanche forecasts, USGS quakes
+
+Exports: GPX tracks, GeoJSON sectors with coverage and probability,      §9
+         CSV/JSON event log, per-assignment PDF, the mission file itself
+
+Growth:  field phones with sectors (§13); airborne relay (§14);
+         anonymizer -> server -> layers and training (§15)</pre>
+  <p>Every arrow above the console is a standard protocol: LoRa, serial, protobuf, SQLite, HTTP, WebSocket. Every box is either an existing library or a Python module the team writes. The two interfaces to write down before parallel work starts are the database schema and the WebSocket message set.</p>
+</section>
+
+<section id="s11">
+  <h2><span class="num">11</span>Costs and roadblocks, consolidated</h2>
+  <div class="tablewrap"><table>
+    <thead><tr><th>Category</th><th>Expected</th><th>Notes</th></tr></thead>
+    <tbody>
+      <tr><td>Hardware</td><td>$300–600 for four to six nodes, antennas, batteries, one mast</td><td>Grant-eligible if a team ever adopts; Colorado's backcountry SAR fund pays for equipment</td></tr>
+      <tr><td>Software licenses</td><td>$0</td><td>Everything is GPL, MIT, Apache, or public domain</td></tr>
+      <tr><td>Cloud</td><td>$0 for the capstone</td><td>Only the Scrubbed Server (<span class="ref">§15</span>) needs a host, and free tiers exist</td></tr>
+      <tr><td>Code signing</td><td>$0–500 per year</td><td>Optional; affects first-run experience only</td></tr>
+      <tr><td>App stores</td><td>$25 once plus $99 per year</td><td>Only if <span class="ref">§13</span> ships as a store app</td></tr>
+      <tr><td>Data</td><td>$0</td><td>3DEP, NLCD, OSM, WBD, NWS, NIFC, USGS are public. ISRID raw data is not available; use the published tables (<span class="ref">§5.3</span>).</td></tr>
+      <tr><td>Time</td><td>The real cost</td><td>Planetiler statewide build: hours. Colorado 10 m DEM: tens of gigabytes. Each field test is a day outdoors.</td></tr>
+      <tr><td>Legal and ethical</td><td>Position-data privacy; IRB for any exercise with outside participants; FCC Part 15 (no license)</td><td>No operational-mission use until a team decides; every outreach message says so</td></tr>
+      <tr><td>Access to practitioners</td><td>SAR teams' time</td><td>Joining a team is not a near-term path; a self-run exercise on a group backcountry trip is the fallback</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<section id="s12">
+  <h2><span class="num">12</span>Questions to answer before Design closes</h2>
+  <ol>
+    <li>Sector Probability: implement the published models on open data first, with learning from real outcomes as a later phase (<span class="ref">§5.3</span>)? If yes, which validation tier (<span class="ref">§5.5</span>) is in scope for EXPO?</li>
+    <li>Which sector definition does the first version use: drawn, imported, or generated (<span class="ref">§5.4</span>)? The coverage math and the export format both depend on it.</li>
+    <li>Which current-conditions feeds are in the first version of the probability model: weather only, or weather plus fire, flood, and avalanche (<span class="ref">§5.2</span>)?</li>
+    <li>Which preset and position interval will the demo mesh run, and what node ceiling does the airtime model give at that setting (<span class="ref">§2.6</span>)?</li>
+    <li>Gateway: the Heltec over USB, or a <code>meshtasticd</code> Pi that can also live on a mast (<span class="ref">§2.5</span>)?</li>
+    <li>What sweep widths do real teams use for foot and dog searchers in open, moderate, and dense terrain (<span class="ref">§3.5</span>)? Coverage numbers are only as honest as this input.</li>
+    <li>What does a real CalTopo segment export look like, field by field (<span class="ref">§9</span>)? Needs one export from a practitioner's account.</li>
+    <li>For pre-planning, which weights does the first version expose to the commander, and what is the fallback when no probability data exists for a subject category (<span class="ref">§7.1</span>)?</li>
+    <li>Where do four teammates develop when the hardware is at one house? <code>meshtasticd</code> on each laptop plus the simulator (<span class="ref">§3.1</span>) should be set up in week one.</li>
+    <li>Mission file as GeoPackage from day one (<span class="ref">§4.1</span>)? Cheap now, painful later.</li>
+    <li>What is the retention rule for the live mission file, and who can open it (<span class="ref">§4.3</span>)? Decide before the first packet is stored.</li>
+    <li>Is store-and-forward for positions worth a firmware contribution proposal after EXPO (<span class="ref">§2.4</span>)? It is the one gap the laptop cannot close.</li>
+  </ol>
+</section>
+
+<!-- ===================== PART TWO ===================== -->
+<div class="part" id="part2">
+  <p class="kicker">Part Two</p>
+  <h2>The Three Growth Objectives</h2>
+  <p class="lede">Not required for the pillars to work. Each is described at the depth needed to decide whether it is worth it, what it would take, and what in Part One it depends on.</p>
+</div>
+
+<section id="s13">
+  <h2><span class="num">13</span>Field User Sync</h2>
+  <p>Definition: live updates to field users of all location data for better in-field mapping. Every searcher sees the other teams, the covered ground, and their own sector boundaries in real time: fewer duplicated sweeps, fewer teams crossing into each other's areas, faster reaction when a neighboring team finds something.</p>
+
+  <h3><span class="num">13.1</span>What the mesh already does</h3>
+  <p>The physics answer is simpler than the design doc assumes. Because the mesh floods every broadcast (<span class="ref">§2.1</span>), every node already hears every other node's position and stores it. A phone paired to a node over Bluetooth reads that node's database and draws it. There is no server, no upload, no download, and no round trip through the command post. Field-to-field awareness of positions therefore exists today with stock firmware and the stock app; the gap is everything richer than a dot and a name.</p>
+  <div class="tablewrap"><table>
+    <thead><tr><th>Direction</th><th>Payload</th><th>Mechanism</th><th>Where it shows up today</th></tr></thead>
+    <tbody>
+      <tr><td>Field to everyone</td><td>Position, telemetry, node info</td><td>Broadcast on the channel</td><td>Every node's database; every paired phone; the command post</td></tr>
+      <tr><td>Command post to field</td><td>Text message</td><td>Channel broadcast, or encrypted direct message with acknowledgement</td><td>Stock app messages tab</td></tr>
+      <tr><td>Command post to field</td><td>Waypoint (one point with name, icon, expiry)</td><td>Waypoint packet</td><td>Stock app map</td></tr>
+      <tr><td>Command post to field</td><td>Config changes (intervals, role, channel)</td><td>Admin message using a key stored on the node</td><td>Reboots the node</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3><span class="num">13.2</span>What does not flow without a custom app</h3>
+  <div class="tablewrap"><table>
+    <thead><tr><th>Payload</th><th>Why not</th></tr></thead>
+    <tbody>
+      <tr><td>Sector polygons</td><td>No polygon primitive; 233-byte cap (<span class="ref">§2.4</span>); stock apps ignore custom message types</td></tr>
+      <tr><td>Assignments, coverage overlays, probability surfaces, planned routes</td><td>Same</td></tr>
+      <tr><td>Anything larger than a text message</td><td>Airtime (<span class="ref">§2.6</span>). A 2 KB polygon on LongFast is roughly 20 seconds of channel time per hop.</td></tr>
+    </tbody>
+  </table></div>
+  <p>Design consequence: the command post can already tell a field team "go to this point" and "your sector is B; the boundary is on the paper map" (<span class="ref">§7.4</span>). Drawing the boundary on their phone requires our own app and a compact encoding (simplified polygon, or a sector ID that the phone resolves against a pre-loaded plan).</p>
+
+  <h3><span class="num">13.3</span>Application paths</h3>
+  <div class="tablewrap"><table>
+    <thead><tr><th>Path</th><th>Language</th><th>Effort</th><th>Store cost</th><th>Notes</th></tr></thead>
+    <tbody>
+      <tr><td>Stock Meshtastic app</td><td>—</td><td>None</td><td>$0</td><td>Zero codebases. Field-to-field positions, messages, waypoints, offline maps. Already covers "see other members in the field."</td></tr>
+      <tr><td>Fork Meshtastic-Android and Meshtastic-Apple</td><td>Kotlin, Swift</td><td>Very high</td><td>$25 once (Google), $99 per year (Apple)</td><td>Two large codebases and their release cadence to inherit</td></tr>
+      <tr><td>Kotlin Multiplatform app on <code>meshtastic-sdk</code></td><td>Kotlin</td><td>High</td><td>Same</td><td>One shared core with thin UI per platform (Compose Multiplatform can share the UI too). The SDK is pre-1.0 but official (<span class="ref">§2.2</span>). The strongest option if the team commits.</td></tr>
+      <tr><td>React Native or Flutter</td><td>TypeScript, Dart</td><td>High</td><td>Same</td><td>No official Meshtastic library for either. A BLE library (<code>react-native-ble-plx</code>) plus generated protobufs, then reimplement the handshake, node database sync, and acknowledgement tracking. That is exactly the work the Kotlin and TypeScript SDKs already do.</td></tr>
+      <tr><td>Progressive web app on <code>@meshtastic/core</code></td><td>TypeScript</td><td>Medium</td><td>$0, no store</td><td>Runs in Chrome on Android over Web Bluetooth; can be served from the command post laptop over local Wi-Fi. Does not work on iOS: Safari has no Web Bluetooth.</td></tr>
+      <tr><td>ATAK plugin</td><td>Java, Kotlin</td><td>Medium to high</td><td>$0</td><td>Android only; the learning curve is the reason to avoid it for volunteers</td></tr>
+      <tr><td>Radio with its own screen (T-Deck, MUI devices)</td><td>—</td><td>None</td><td>$0</td><td>Field members see nodes and messages on the radio itself; no phone required</td></tr>
+    </tbody>
+  </table></div>
+  <p>A React Native assumption is the one path with the least existing help. If a field app is built, the Kotlin Multiplatform SDK is the strongest choice, with a PWA as the cheapest Android-only demonstration.</p>
+
+  <h3><span class="num">13.4</span>What a custom app would add</h3>
+  <p>Sector polygons and assignment labels on the searcher's phone; "you are outside your sector" warnings; live coverage feedback to the searcher; the planned route from <span class="ref">§7</span>; richer command-to-field acknowledgement than a text. All of it needs a custom message type on the mesh plus airtime budgeting.</p>
+
+  <h3><span class="num">13.5</span>Phone-specific roadblocks</h3>
+  <p>iOS restricts Bluetooth in the background, so positions arrive only while the app is foregrounded or holds location permission. BLE plus screen drains batteries. Every searcher needs both a radio and a phone. App Store review runs weeks against a capstone calendar. Two platforms' worth of bug reports from volunteers. The stock app already absorbs all of this.</p>
+
+  <h3><span class="num">13.6</span>Dependencies and recommendation</h3>
+  <p>Depends on: the mesh having airtime to send data outward (<span class="ref">§2.6</span>), the plan existing in a compact form (<span class="ref">§7</span>), and a sector encoding small enough for the payload cap. Independent of the probability model. Recommendation: split it in two. Field-to-field awareness is done; use the stock app and demonstrate it. Command-to-field sectors get a named design (custom message type plus a Kotlin Multiplatform app) as the next version, so the pitch says exactly what comes next rather than promising it now.</p>
+</section>
+
+<section id="s14">
+  <h2><span class="num">14</span>Drone Extension</h2>
+  <p>Definition: a drone carrying an extra mesh radio to extend range. A radio a few hundred feet up sees over ridges that ground radios cannot; paired with the coverage model, planners know how much more of the search area an airborne relay brings into contact.</p>
+
+  <h3><span class="num">14.1</span>The coverage algorithm already handles it</h3>
+  <p>An elevated node is an antenna-height parameter in step 2 of <span class="ref">§6.2</span>. A relay at 120 m above ground is the same line-of-sight and link-budget calculation with a taller transmitter, and the relay-placement pass in <span class="ref">§6.3</span> can evaluate candidate hover points exactly as it evaluates ridge sites. This means the modeling half of the drone idea costs almost nothing once <span class="ref">§6</span> exists: show the coverage gain of a relay at a given hover point and altitude, and let the commander decide whether it is worth flying.</p>
+
+  <h3><span class="num">14.2</span>Flight, payload, and airspace</h3>
+  <div class="tablewrap"><table>
+    <thead><tr><th>Constraint</th><th>Reality</th></tr></thead>
+    <tbody>
+      <tr><td>Payload</td><td>A field node with battery and antenna is 100–200 g; well within a consumer or prosumer quadcopter's margin</td></tr>
+      <tr><td>Flight time</td><td>20–40 minutes per battery for most consumer platforms; a relay that must stay up needs a battery-swap cycle (fly out, hover, return, swap) and a dedicated operator at the command post, as discussed on September 3</td></tr>
+      <tr><td>Airspace</td><td>Non-recreational flight falls under FAA Part 107 (a certified remote pilot, 400 ft ceiling above ground, visual line of sight). Some SAR agencies fly under public-aircraft rules instead. Wilderness areas and national parks restrict or prohibit drones.</td></tr>
+      <tr><td>Weather and terrain</td><td>Wind at ridge height, cold-weather battery loss, and altitude density all cut flight time in the terrain where a relay is most useful</td></tr>
+      <tr><td>Drone data access</td><td>DJI's mobile SDK is closed and restricted; open flight stacks (ArduPilot, PX4 over MAVLink) allow full telemetry but mean building or buying a non-DJI airframe. For a relay, none of this matters: the node on the drone talks to the mesh directly and the drone is just a lift.</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3><span class="num">14.3</span>Modeling exercise or hardware exercise</h3>
+  <p>Modeling first, and possibly only. The coverage gain of an airborne relay is demonstrable on the map without a drone, and it is the same demonstration a mast relay gets (<span class="ref">§2.5</span>). A mast is cheaper, stays up all day, needs no pilot, and is legal everywhere; it is the ground-based form of the same idea and the one to build if the team wants a physical relay at all. A drone flight is a compelling demo if a certified pilot and a suitable site are available, but it should not shape the core system.</p>
+</section>
+
+<section id="s15">
+  <h2><span class="num">15</span>Scrubbed Server</h2>
+  <p>Definition: since location data is already collected for the probability model, a server-side component scrubs the data after the algorithms have used it and stores the resulting mapping in layers. Layers for pre-planning: future searches in the same area start from real history. Layers for late teams: arriving teams load current coverage and go straight to unsearched ground. A stored record for after-action review, training, and old cases.</p>
+
+  <h3><span class="num">15.1</span>Separate from the live database</h3>
+  <p>The design doc asks whether this lives on the command post laptop or is synced somewhere afterward. It is a separate system, synced afterward, for four reasons.</p>
+  <ol>
+    <li>Different lifecycle. The live file (<span class="ref">§4</span>) is created at mission start, read for replay, then archived. The server accumulates across missions and teams.</li>
+    <li>Different access control. The live file holds named people's exact positions. The server must not.</li>
+    <li>Different connectivity. The live file is offline by design; the server is online by design.</li>
+    <li>Different consent. A team recording its own exercise is one thing. Contributing to a cross-agency database is an opt-in act with an IRB and consent-form trail.</li>
+  </ol>
+
+  <h3><span class="num">15.2</span>Architecture</h3>
+  <div class="tablewrap"><table>
+    <thead><tr><th>Piece</th><th>Status</th><th>Language</th><th>Notes</th></tr></thead>
+    <tbody>
+      <tr><td>Anonymizer</td><td>Build</td><td>Python</td><td>Runs on the command post before upload; see <span class="ref">§15.3</span></td></tr>
+      <tr><td>Upload endpoint</td><td>Build</td><td>Python (FastAPI)</td><td>Accepts the anonymized export, never the raw mission file; authenticated per team</td></tr>
+      <tr><td>Server database</td><td>Exists</td><td>PostgreSQL + PostGIS</td><td>Free, open source, the standard for spatial history. Supabase or Neon free tiers, or a $5–10 per month VPS</td></tr>
+      <tr><td>Layer service</td><td>Build</td><td>Python (FastAPI) or pg_tileserv</td><td>Serves coverage and history layers back to the command post as tiles or GeoJSON when it is online</td></tr>
+      <tr><td>Training pipeline</td><td>Build</td><td>Python (pandas, geopandas, scikit-learn)</td><td>Consumes the server database, produces model artifacts the command post binary ships with (<span class="ref">§5.6</span>)</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3><span class="num">15.3</span>What scrubbing removes and what it keeps</h3>
+  <div class="tablewrap"><table>
+    <thead><tr><th>Removed</th><th>Kept</th></tr></thead>
+    <tbody>
+      <tr><td>Node IDs, device names, operator names, team names, message text</td><td>Team type (foot, dog, vehicle) and sweep width used</td></tr>
+      <tr><td>Exact timestamps (coarsen to the operational period)</td><td>Date, season, weather and hazard state at the time</td></tr>
+      <tr><td>Individual tracks (replace with the coverage raster they produced)</td><td>Coverage per cell per period; sectors with their coverage and probability numbers</td></tr>
+      <tr><td>Subject identity and any case narrative</td><td>Subject category, initial planning point (grid-snapped), find location (grid-snapped), outcome</td></tr>
+    </tbody>
+  </table></div>
+  <p>The last row is what makes the server feed back into the probability model (<span class="ref">§5.2</span>, last row): the anonymized find location relative to the initial planning point, by subject category, terrain, and conditions, is precisely the statistic ISRID holds and the team cannot otherwise obtain. Every contributing team's outcomes make the next team's model better.</p>
+
+  <h3><span class="num">15.4</span>Ownership, access, and dependencies</h3>
+  <p>The contributing agency owns its data and can withdraw it; the layers derived from many agencies' data are shared under the same open license as the software. Access to raw uploads is limited to the contributing agency; access to derived layers is open to any team running the software. Depends on: the live database and its schema (<span class="ref">§4</span>), the append-only history that makes an export complete, the IRB and consent process (<span class="ref">§9</span>), and internet at the station after the mission. Feeds: the probability model (<span class="ref">§5</span>) and the planner (<span class="ref">§7</span>) with real history instead of a blank map.</p>
+</section>
+
+<section id="s16">
+  <h2><span class="num">16</span>Growth dependencies and questions</h2>
+  <div class="tablewrap"><table>
+    <thead><tr><th>Objective</th><th>Depends on (Part One)</th><th>Feeds</th><th>Smallest useful version</th></tr></thead>
+    <tbody>
+      <tr><td>Field User Sync (<span class="ref">§13</span>)</td><td>Airtime budget (<span class="ref">§2.6</span>); compact plan encoding (<span class="ref">§7</span>)</td><td>Field execution of the plan</td><td>Stock app for positions; waypoints for sector centroids; a PWA demo on Android</td></tr>
+      <tr><td>Drone Extension (<span class="ref">§14</span>)</td><td>Coverage model with antenna height (<span class="ref">§6.2</span>); relay placement (<span class="ref">§6.3</span>)</td><td>Pre-planning: extended ranges</td><td>Show the coverage gain of a relay at a hover point on the map; build a mast instead of flying</td></tr>
+      <tr><td>Scrubbed Server (<span class="ref">§15</span>)</td><td>Live schema (<span class="ref">§4</span>); consent process (<span class="ref">§9</span>)</td><td>Probability model (<span class="ref">§5</span>) and planner (<span class="ref">§7</span>)</td><td>An anonymized export format defined now, so the first exercise's data is usable later</td></tr>
+    </tbody>
+  </table></div>
+  <ol>
+    <li>Field User Sync: is the Android-only PWA worth building as an EXPO demonstration of command-to-field sectors, or does the pitch rest on the stock app plus a named next-version design?</li>
+    <li>Drone Extension: does anyone on the team hold or want a Part 107 certificate, and is there a site where flying is permitted? If not, the mast is the physical relay.</li>
+    <li>Scrubbed Server: define the anonymized export format during Design so that the schema (<span class="ref">§4.2</span>) captures what it needs, even though the server itself waits.</li>
+    <li>All three: which one, if any, is the team excited enough about to prototype in the spring after the pillars are demonstrable?</li>
+  </ol>
+</section>
+
+<footer class="end">
+  MaroonNet · Foundation Inventory v2 · Discovery phase working document · September 7, 2026 · Sources checked this week: Meshtastic firmware releases and organization repositories (firmware, web, Meshtastic-Android, Meshtastic-Apple, meshtastic-sdk); ISRID and lost-person-behavior literature (Koester 2008; Sava, Twardy, and Koester 2016; SARBayes); public data catalogs (USGS 3DEP, NLCD, ESA WorldCover, OpenStreetMap, USGS WBD, NWS, NIFC, NASA FIRMS).
+</footer>
+
+</div>
+</body>
+</html>
