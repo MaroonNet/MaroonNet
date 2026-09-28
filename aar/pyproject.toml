@@ -1,0 +1,31 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "aar"
+version = "0.1.0"
+description = "MaroonNet After Action Report: the mission store draft and the replay queries over it"
+readme = "README.md"
+requires-python = ">=3.10"
+# No runtime dependencies. The store draft uses sqlite3 from the standard library so the
+# package installs anywhere and so the engine question (AAR Architecture v1.0 section 5.3)
+# stays open: nothing here locks the team into SQLite.
+dependencies = []
+
+[project.optional-dependencies]
+dev = ["pytest>=7"]
+# Coverage views (F-08, F-10) need buffers and unions over tracks. Added when those are built.
+geo = ["shapely>=2.0"]
+
+[project.scripts]
+aar = "aar.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+"aar.store" = ["schema.sql"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
