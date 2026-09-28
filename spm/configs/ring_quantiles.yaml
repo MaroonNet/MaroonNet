@@ -1,0 +1,22 @@
+# Published ring distances, in km, per canonical category.
+#
+# Fill these in from Koester, Lost Person Behavior (2008): the straight-line
+# IPP-to-find distance table for each category. Use the ecoregion/terrain row
+# that matches the cases being scored (for the MapScore Arizona set: Dry).
+# Record the page number so the numbers can be checked.
+#
+# Leave a category out (or blank) and the fitted-from-data ring model is used
+# instead. Once any entry is complete, `spm evaluate --models ring_published`
+# scores the published-table ring model alongside the fitted one.
+#
+# Example shape (values intentionally blank; do not invent them):
+#
+# categories:
+#   hiker:
+#     q25:
+#     q50:
+#     q75:
+#     q95:
+#     source: "LPB 2008 p. ___, Dry, Mountainous"
+
+categories: {}
