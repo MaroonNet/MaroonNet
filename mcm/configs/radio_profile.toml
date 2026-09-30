@@ -1,0 +1,33 @@
+# MaroonNet radio profile: the one place the radio settings and the firmware pin are recorded.
+#
+# Contract C-08 (radio pin) lives here once the team picks it. MCM v1.1 section 6.3: pin every node
+# and the Python library to one firmware version for the semester, and record it in the repository.
+# Nothing below is decided. Status labels follow MCM Architecture v1.0 section 1.
+#
+# Never put a channel key (PSK) in this file or anywhere in the repository. Keys live on the
+# devices and in a teammate's password manager (CLAUDE.md).
+
+[firmware]
+# Open: MCM v1.1 section 9 question 4. Set both together, from release notes, after a bench test.
+version = ""               # e.g. "2.x.y.abcdef", stable only, never alpha or beta
+python_library = ""        # the meshtastic PyPI version tested against that firmware
+pinned_on = ""             # YYYY-MM-DD, the day the team verified the pin
+board = "heltec-v3"        # Team answer: the team owns Heltec V3 boards
+
+[gateway]
+# Team answer: a radio next to the laptop over USB serial. TCP, Bluetooth, MQTT stay in view.
+transport = "serial"
+port = ""                  # empty: let the library find the radio; else e.g. "/dev/ttyUSB0" or "COM4"
+role = "CLIENT_MUTE"       # Proposed: the gateway listens and does not rebroadcast. Research.
+
+[lora]
+# Open: preset and interval set the node limit (MCM v1.1 section 6.1). Run `mcm airtime` first.
+region = "US"              # 915 MHz ISM band, FCC Part 15; no license needed (MCM v1.1 section 6.9)
+modem_preset = "LONG_FAST" # the firmware default; a candidate, not a choice
+hop_limit = 3              # the firmware default
+
+[position]
+# Open: the interval also sets how fine the AAR tracks are.
+broadcast_interval_s = 60
+smart_broadcast = false    # Proposed off: with it on, a still radio goes quiet and looks out of range
+gap_factor = 3.0           # Proposed: silence longer than gap_factor x interval counts as a gap
