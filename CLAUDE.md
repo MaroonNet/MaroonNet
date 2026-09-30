@@ -26,6 +26,7 @@ Elijah (SAR technology research), Diego (meeting minutes, stand-ups). Advisor: P
 firmware/   Meshtastic device configs, channel presets, any custom node firmware
 backend/    Ingest service (mesh -> DB), API, replay/timelapse generation
 web/        Browser map UI (live view + AAR replay)
+spm/        Sector Probability Mapping: lost-person probability rasters, models, MapScore eval
 hardware/   Bill of materials, wiring, enclosure notes, antenna/range test logs
 docs/       ADRs, meeting minutes, research, outreach log, EXPO material
 .github/    CI workflows, PR/issue templates, CODEOWNERS
