@@ -1,5 +1,5 @@
-# Root ignores: secrets, per-person Claude files, OS and editor noise.
-# Each area (backend/*, frontend/*, ml) has its own .gitignore for its language and build output.
+# Root .gitignore
+# Each area (backend/*, frontend/*, ml) adds its own .gitignore when its stack is chosen.
 
 # Secrets and local config
 .env
