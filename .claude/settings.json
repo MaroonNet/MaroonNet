@@ -1,17 +1,19 @@
 {
-  "enabledPlugins": {
-    "github@claude-plugins-official": true,
-    "commit-commands@claude-plugins-official": true,
-    "pr-review-toolkit@claude-plugins-official": true,
-    "security-guidance@claude-plugins-official": true,
-    "pyright-lsp@claude-plugins-official": true
-  },
   "permissions": {
     "deny": [
-      "Bash(git push --force*)",
-      "Bash(git push -f*)",
-      "Bash(git push origin main*)",
-      "Bash(git reset --hard*)",
+      "Bash(git add*)",
+      "Bash(git commit*)",
+      "Bash(git push*)",
+      "Bash(git rebase*)",
+      "Bash(git merge*)",
+      "Bash(git cherry-pick*)",
+      "Bash(git reset*)",
+      "Bash(git tag*)",
+      "Bash(git stash*)",
+      "Bash(git config*)",
+      "Bash(gh pr create*)",
+      "Bash(gh pr merge*)",
+      "Bash(gh pr review*)",
       "Read(./.env)",
       "Read(./.env.*)",
       "Read(./**/*.pem)",

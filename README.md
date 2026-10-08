@@ -1,53 +1,51 @@
 # MaroonNet
 
-Open-source location tracking, logging, and after-action replay for Search & Rescue teams operating
-beyond cell service. Built on LoRa / Meshtastic mesh radios.
+Offline, mesh-networked search-and-rescue command post built on Meshtastic LoRa radios.
+University of Colorado Denver senior capstone, Fall 2026 – Spring 2027.
 
-> **Status: student prototype.** MaroonNet is a University of Colorado Denver senior capstone project
-> (Fall 2026 – Spring 2027). It is not certified for life-safety use. Do not rely on it as a primary
-> means of locating people.
+> **Student prototype.** MaroonNet is not certified for life-safety use. Do not rely on it as a
+> primary means of locating people.
 
-## The idea
+## Structure
 
-Searchers carry small LoRa radios running Meshtastic. Each radio periodically broadcasts its GPS
-position and a timestamp across the mesh. A base-station node at the incident command post receives
-those pings, and MaroonNet:
+| Directory | What it holds | Who to ask |
+|---|---|---|
+| `backend/missiondb` | Mission data: what the radios reported, when, and the replay of it | Corey Greene |
+| `backend/mapdb` | Maps, terrain and tiles the command post works on | Joshua "JJ" Wagner |
+| `frontend/web` | The command post web application | Elijah Heimsoth |
+| `frontend/mobile` | The field application | Diego Alas |
+| `ml` | Lost-person probability modeling | Joshua "JJ" Wagner |
 
-1. stores every ping in a database,
-2. shows the Squad Leader a live browser map of where every searcher is right now, and
-3. after the operation, replays the stored tracks as a timelapse and coverage map so the team can see
-   what ground was actually covered and what was missed, for After Action Reports.
+Other `backend/` subfolders are added as the work needs them. The repository holds code; design
+documents and notes live with their authors and are shared in the team's Discord. Claude Code
+reads `CLAUDE.md` for the rules it follows here.
 
-Stretch goal: mesh nodes carried by drones to extend coverage over ridgelines and drainages.
+## Working on the repository
 
-## Repository layout
+1. Branch from an up-to-date `main`. Nobody pushes to `main`.
+2. Commit your own work, signed. Claude may draft and explain; a teammate commits.
+3. Open a pull request with two or three sentences on what changed. Two teammates approve.
+   Squash-merge.
 
-| Directory   | Contents                                                              |
-| ----------- | --------------------------------------------------------------------- |
-| `firmware/` | Meshtastic device configuration, channel presets, node role settings  |
-| `backend/`  | Ingest service (mesh to database), API, replay generation             |
-| `web/`      | Browser map UI for live view and AAR replay                           |
-| `hardware/` | Bill of materials, wiring, enclosures, antenna and range test logs    |
-| `docs/`     | Architecture decisions, meeting minutes, research, outreach log       |
-
-## Getting started
+Before your first commit, set up signing once (the ruleset requires signed commits):
 
 ```bash
-git clone https://github.com/<org-or-user>/MaroonNet.git
-cd MaroonNet
-uv sync
-uv run pytest
+git config --global user.name  "Your Name"
+git config --global user.email "<an email verified on your GitHub account>"
+git config --global gpg.format ssh
+git config --global user.signingkey ~/.ssh/id_ed25519.pub     # ssh-keygen -t ed25519 if you have no key
+git config --global commit.gpgsign true
+gh ssh-key add ~/.ssh/id_ed25519.pub --type signing --title "<machine> signing"
 ```
 
-See `CONTRIBUTING.md` for the branch and review workflow, and `CLAUDE.md` if you are using Claude Code
-on this repo.
-
-## Team
-
-Corey Greene, Elijah Heimsoth, Joshua "JJ" Wagner, and Diego Alas, advised by Professor David Ogle,
-University of Colorado Denver.
+(Or GitHub → Settings → SSH and GPG keys → New SSH key → Key type **Signing Key**.)
 
 ## License
 
-GPL-3.0. See `LICENSE`. MaroonNet depends on the Meshtastic ecosystem, which is GPL-3.0 licensed;
-using the same license keeps the project compatible and keeps derivative work open.
+GPL-3.0. See `LICENSE`. The Meshtastic firmware and Python library are GPL-3.0; the same
+license keeps MaroonNet compatible with them.
+
+## Team
+
+Diego Alas, Corey Greene, Elijah Heimsoth and Joshua "JJ" Wagner, advised by Professor David
+Ogle, University of Colorado Denver.
