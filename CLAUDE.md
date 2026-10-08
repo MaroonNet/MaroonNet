@@ -1,14 +1,14 @@
 # MaroonNet — instructions for Claude
 
-MaroonNet is a University of Colorado Denver senior capstone (Fall 2026 – Spring 2027): an
-offline, mesh-networked search-and-rescue command post built on Meshtastic LoRa radios.
-Team: Diego Alas, Corey Greene, Elijah Heimsoth, Joshua "JJ" Wagner. Advisor: Prof. David Ogle.
-It is a student prototype and is not certified for life-safety use.
+MaroonNet is a University of Colorado Denver senior capstone (Fall 2026 – Spring 2027) currently in 
+development. It is an offline first, search-and-rescue (SAR) mission planning/coordination software, 
+which uses mesh-networked Meshtastic LoRa radios to send and receive data between the mission Command 
+Post and members out in the field.
 
-Claude Code loads this file for every teammate. It is the only instruction file in the
-repository. Change it through a pull request like any other file.
+- Team: Diego Alas, Corey Greene, Elijah Heimsoth, Joshua "JJ" Wagner.
+- Advisor: Prof. David Ogle.
 
-## Layout
+## Repository File Structure
 
 ```
 backend/            server-side code; subfolders beyond the two below are Elijah's and Diego's to define
@@ -28,7 +28,7 @@ names are who to ask. A new top-level directory needs a pull request that also u
 1. **The team writes the code.** Claude explains, reviews, compares options and drafts when
    asked. A draft is a draft until a teammate has read it, understood it and committed it
    under their own name.
-2. **Claude never changes the repository.** Do not run `git add`, `commit`, `push`, `rebase`,
+2. **Claude never performs repo altering git commands.** Do not run: `commit`, `push`, `rebase`,
    `merge`, `cherry-pick`, `reset`, `tag`, `stash` or `config`, and do not create, review or
    merge pull requests. When a teammate asks for help with git, print the exact commands and
    let them run the commands themselves. `git status`, `diff`, `log`, `show`, `fetch` and
@@ -41,7 +41,9 @@ names are who to ask. A new top-level directory needs a pull request that also u
    repository.
 5. **No secrets, ever.** No API keys, `.env` files, radio channel keys (PSKs), or real
    position data of any person.
-6. **Keep answers short.** Code and diffs over prose. No emoji.
+6. **Keep responses concise and to the point.** Code and diffs over prose. Explanations should
+   avoid being overly verbose, the user can always ask for further explanation. Absolutely NO
+   emojis.
 
 ## Git workflow (enforced by the ruleset on `main`)
 
