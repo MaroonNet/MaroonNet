@@ -1,110 +1,50 @@
-# MaroonNet — Claude instructions
+# MaroonNet — instructions for Claude
 
-This file is the single source of truth for how Claude works on this repo. It is committed to git and
-loaded automatically by Claude Code for every teammate, so nobody should keep a private copy.
-Edit it through a normal pull request, like any other file. Keep it under 200 lines.
+MaroonNet is a University of Colorado Denver senior capstone (Fall 2026 – Spring 2027): an
+offline, mesh-networked search-and-rescue command post built on Meshtastic LoRa radios.
+Team: Diego Alas, Corey Greene, Elijah Heimsoth, Joshua "JJ" Wagner. Advisor: Prof. David Ogle.
+It is a student prototype and is not certified for life-safety use.
 
-## What this project is
+Claude Code loads this file for every teammate. It is the only instruction file in the
+repository. Change it through a pull request like any other file.
 
-MaroonNet is a CU Denver senior capstone (Fall 2026 – Spring 2027, presenting at the Spring 2027 EXPO).
-It is an open-source location management, tracking, and logging system for Search & Rescue (SAR) teams
-operating where there is no cell service.
-
-- Field searchers carry LoRa / Meshtastic radios that broadcast GPS position + timestamp over the mesh.
-- A base-station node feeds those pings into a backend, which stores them in a database.
-- A browser-based map shows the Squad Leader live searcher positions over the search area.
-- After the operation, the stored track data rebuilds the search as a timelapse / coverage map for
-  After Action Reports (think "Hero's Path" in Breath of the Wild) so missed areas are visible.
-- Stretch goal: drones carrying mesh nodes to extend range.
-
-Team: Corey (repo/git/infra, outreach email), JJ (documentation, outreach calls, hardware custodian),
-Elijah (SAR technology research), Diego (meeting minutes, stand-ups). Advisor: Prof. David Ogle.
-
-## Repo layout
+## Layout
 
 ```
-firmware/   Meshtastic device configs, channel presets, any custom node firmware
-backend/    Ingest service (mesh -> DB), API, replay/timelapse generation
-web/        Browser map UI (live view + AAR replay)
-spm/        Sector Probability Mapping: lost-person probability rasters, models, MapScore eval
-hardware/   Bill of materials, wiring, enclosure notes, antenna/range test logs
-docs/       ADRs, meeting minutes, research, outreach log, EXPO material
-.github/    CI workflows, PR/issue templates, CODEOWNERS
+backend/            server-side code; subfolders beyond the two below are Elijah's and Diego's to define
+  missiondb/        mission data: what the radios reported, when, and the replay of it    Corey
+  mapdb/            maps, terrain and tiles the command post works on                     JJ
+frontend/
+  web/              the command post web application                                      Elijah
+  mobile/           the field application                                                 Diego
+ml/                 lost-person probability modeling                                      JJ
 ```
 
-If you create a new top-level directory, add it to this list in the same PR.
+The repository is organized by kind of work, not by person. Anyone may work anywhere; the
+names are who to ask. A new top-level directory needs a pull request that also updates this list.
 
-## Stack (PROPOSED — confirm at the Wednesday advisor meeting, then delete this parenthetical)
+## Rules
 
-- Backend: Python 3.12, `meshtastic` PyPI library for radio I/O, FastAPI for the API, SQLite for
-  dev with a schema that ports cleanly to PostgreSQL + PostGIS.
-- Web: plain HTML/CSS/JS with Leaflet for maps; no framework until a concrete need is demonstrated.
-- Tooling: `uv` for Python envs, `ruff` for lint+format, `pytest` for tests, `pre-commit` hooks.
-- Record any change to the above as an ADR in `docs/adr/` before writing code against it.
+1. **The team writes the code.** Claude explains, reviews, compares options and drafts when
+   asked. A draft is a draft until a teammate has read it, understood it and committed it
+   under their own name.
+2. **Claude never changes the repository.** Do not run `git add`, `commit`, `push`, `rebase`,
+   `merge`, `cherry-pick`, `reset`, `tag`, `stash` or `config`, and do not create, review or
+   merge pull requests. When a teammate asks for help with git, print the exact commands and
+   let them run the commands themselves. `git status`, `diff`, `log`, `show`, `fetch` and
+   `pull` are fine. `.claude/settings.json` enforces this; do not work around it.
+3. **Claude makes no decisions.** Give options and trade-offs; do not present a choice as
+   settled. The team decides in its meetings and records its own decisions.
+4. **The repository holds code.** Design documents, notes and research live with their
+   authors and are shared in Discord. Teammates may add a document here themselves; Claude
+   does not write or propose documentation, templates, roadmaps or placeholder files for the
+   repository.
+5. **No secrets, ever.** No API keys, `.env` files, radio channel keys (PSKs), or real
+   position data of any person.
+6. **Keep answers short.** Code and diffs over prose. No emoji.
 
-## Commands
+## Git workflow (enforced by the ruleset on `main`)
 
-```
-uv sync                      # install backend deps
-uv run ruff check . && uv run ruff format --check .   # lint (CI runs this)
-uv run pytest                # tests (CI runs this)
-uv run backend/main.py       # run the ingest + API locally
-```
-
-Run lint and tests before every commit. If a command above is wrong or missing, fix it here.
-
-## Git workflow (enforced by GitHub rulesets — do not try to work around them)
-
-- `main` is protected. Nobody pushes to `main` directly, including admins.
-- Every change goes on a branch named `<type>/<short-description>`, e.g. `feat/live-map-pings`,
-  `fix/gps-timestamp-tz`, `docs/outreach-log`, `chore/ci-ruff`. Branch from an up-to-date `main`.
-- Open a pull request early (draft is fine). A PR needs 2 approvals from the 3 teammates who did
-  not author it, all CI checks green, and all review comments resolved before it can merge.
-- Squash-merge only. The squash commit title becomes the changelog line, so make it read well.
-- Commit messages follow Conventional Commits: `feat:`, `fix:`, `docs:`, `chore:`, `test:`,
-  `refactor:`. First line under 72 characters, imperative mood, body explains *why*.
-- Never commit secrets, API keys, `.env` files, personal location data, or radio channel PSKs.
-  Real channel keys live only on the devices and in a teammate's password manager.
-- Never `git push --force` to a shared branch. Never rewrite history on `main`.
-- Delete branches after merge.
-
-## Coding conventions
-
-- Small, focused PRs. One logical change per PR; split anything over ~400 changed lines.
-- Every new module gets at least one test. Every bug fix gets a regression test.
-- Type hints on all Python function signatures. Docstrings on public functions (one line is fine).
-- Timestamps are stored in UTC as ISO-8601 and converted to local time only in the UI.
-- Coordinates are WGS84 decimal degrees (lat, lon), stored as floats, never as strings.
-- Log with the `logging` module, never `print`, in backend code.
-- Prefer boring, well-documented libraries over clever ones. This has to be maintainable by a
-  volunteer SAR team after we graduate.
-- Match the existing style of the file you are editing. Do not reformat unrelated code in a PR.
-
-## How Claude should behave in this repo
-
-- Before writing code, read the relevant `docs/adr/` entries and the closest existing module.
-- State assumptions explicitly. If a requirement is ambiguous, ask one focused question rather than
-  guessing; if the teammate is unavailable, choose the simplest option and say so in the PR body.
-- Do not invent SAR operational requirements. Anything about how real teams operate must trace to
-  `docs/research/` or an outreach conversation logged in `docs/outreach/`.
-- When asked to "review", check: correctness, tests, secrets, timestamp/coordinate handling, and
-  whether the change matches an ADR. Report findings ranked by severity; do not pad with nits.
-- Explain the reasoning behind recommendations, not just the conclusion. Pragmatic beats ideal.
-- Never claim a test passed, a command ran, or a file exists without actually having done it.
-- Keep responses tight. Code and diffs over prose. No emoji in code, commits, or docs.
-- If you change a build/test command, a directory, or a convention, update this file in the same PR.
-
-## Documentation conventions
-
-- Meeting minutes: `docs/minutes/YYYY-MM-DD.md` (Diego owns these).
-- Decisions: `docs/adr/NNNN-short-title.md` using the template in `docs/adr/0000-template.md`.
-- Outreach: `docs/outreach/log.md` — one row per organization contacted: date, org, who, channel,
-  status, notes. Never store a contact's personal phone/email in the repo; keep those in Discord DMs.
-- README stays current. If the README describes something that no longer exists, fix the README.
-
-## Safety and scope reminders
-
-- This is a location-tracking system for people in the field. Treat position data as sensitive:
-  minimize what is stored, make retention explicit, and never expose a public endpoint without auth.
-- We are students building a prototype. The UI and docs must say so; nothing here is certified for
-  life-safety use and the README carries that disclaimer.
+- Nobody pushes to `main`. Branch, open a pull request, two of the other three teammates
+  approve, squash-merge. Commits are signed with the author's own registered key.
+- A pull request description is two or three plain sentences from its author.
