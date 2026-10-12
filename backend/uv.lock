@@ -634,7 +634,7 @@ wheels = [
 ]
 
 [[package]]
-name = "maroonet-backend"
+name = "maroonnet-backend"
 version = "0.1.0"
 source = { virtual = "." }
 dependencies = [
