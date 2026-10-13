@@ -39,8 +39,9 @@ names are who to ask. A new top-level directory needs a pull request that also u
    authors and are shared in Discord. Teammates may add a document here themselves; Claude
    does not write or propose documentation, templates, roadmaps or placeholder files for the
    repository.
-5. **No secrets, ever.** No API keys, `.env` files, radio channel keys (PSKs), or real
-   position data of any person.
+5. **Never commit secrets.** No API keys, `.env` files, radio channel keys (PSKs), or real
+   position data of any person in the repository. The app may use them at runtime; they
+   just never go in a commit.
 6. **Keep responses concise and to the point.** Code and diffs over prose. Explanations should
    avoid being overly verbose, the user can always ask for further explanation. Absolutely NO
    emojis.
